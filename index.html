@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>食費計算ツール</title>
+  <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>一食あたりの食費を計算｜食費管理ツール</title>
   <style>
     p {
       margin-top: 3px;
@@ -78,11 +78,11 @@
   <p class="desc">購入したときの価格と内容量を入力</p>
 
   <p>価格（円）</p>
-  <input type="number" id="price">
+  <input type="number" id="price" placeholder="例：298">
   <div id="priceError" class="error"></div>
 
-  <p>内容量（g、個など）</p>
-  <input type="number" id="total">
+  <p>内容量（g、mL、個など）</p>
+  <input type="number" id="total" placeholder="例：10">
   <div id="totalError" class="error"></div>
 </div>
 
@@ -90,12 +90,12 @@
   <h3>② 使う量</h3>
   <p class="desc">レシピで使う量と想定人数を入力</p>
 
-  <p>使用量（g、個など）</p>
-  <input type="number" id="used">
+  <p>使用量（g、mL、個など）</p>
+  <input type="number" id="used" placeholder="例：3">
   <div id="usedError" class="error"></div>
   
   <p>人前</p>
-  <input type="number" id="people">
+  <input type="number" id="people" placeholder="例：2">
   <div id="peopleError" class="error"></div>
 </div>
 
