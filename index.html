@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>一食あたりの食費を計算｜食費管理ツール</title>
+  <title>食費計算ツール</title>
   <style>
     p {
       margin: 0px 0px 0px 0px;
@@ -36,7 +36,8 @@
       padding: 8px;
       margin-bottom: 10px;
       border-radius: 8px;
-      width: 250px;
+      width: 100%;
+      max-width: 320px;
     }
 
     .BOX h3 {/*① 食材の情報, ② 使った量, 結果*/
@@ -146,8 +147,10 @@ function validateField(id) {
     return false;
   }
 
+const num = Number(value);
+
 // 数字チェック
-if (!/^[0-9]+$/.test(value) || value < 1) {
+if (!/^[0-9]+$/.test(value) || num < 1) {
   el.style.border = "2px solid red";
   errorEl.innerText = "入力できるのは1以上の数です";
   return false;
