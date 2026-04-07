@@ -1,221 +1,196 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="一食あたりの食費を簡単に計算できるツール。自炊のコストを見える化して節約に役立てよう。価格・使用量・人数を入力するだけで一人前の食費がわかります。">
   <meta name="google-site-verification" content="JUQzpSWXDlmY2dKkkwU9a716EybnjabIKuK38MrQCgc" />
   <title>その一皿、いくら？｜一食あたりの食費計算ツール（自炊・節約）</title>
-  <style>
-    p {
-      margin: 0px 0px 0px 0px;
-    }
-
-    body {
-      font-family: "Helvetica Neue",
-        Arial,
-        "Hiragino Kaku Gothic ProN",
-        "Hiragino Sans",
-        "Noto Sans JP",
-        sans-serif;
-    }
-    
-    input {
-      padding: 1px;
-      font-size: 16px;
-      margin: 0px 0px 0px 0px;
-    }
-    
-    .TITLE_AREA {/*タイトル*/
-      margin: 10px 0px 20px 0px;
-    }
-    
-    .TITLE_AREA h1 {/*タイトル*/
-      margin: 0px 0px 5px 0px;
-    }
-
-    .TITLE_AREA p {/*タイトル*/
-      margin: 0px 0px 0px 0px;
-    }
-
-    .BOX {
-      border: 2px solid #333;
-      padding: 8px;
-      margin-bottom: 10px;
-      border-radius: 8px;
-      width: 100%;
-      max-width: 320px;
-    }
-
-    .BOX h3 {/*① 食材の情報, ② 使った量, 結果*/
-      margin: 0px 0px 0px 0px;
-    }
-    .BOX p {/*① 食材の情報, ② 使った量, 結果*/
-      margin: 0px 0px 5px 0px;
-    }
-
-    .desc {
-      font-size: 13px;
-      color: #666;
-      margin: 0px 0px 8px 0px;
-    }
-
-    .error {
-      color: red;
-      font-size: 12px;
-      min-height: 16px;
-    }
-
-    .RESULT_AREA {
-      display: flex;
-      align-items: center;
-      gap: 15px;  /* ボタンと結果の間の余白 */
-    }
-
-    #result {
-      min-width: 120px;   /* 横幅確保 */
-      min-height: 28px;   /* ←これが本命（高さ固定） */
-      display: flex;
-      align-items: center;
-    }
-
-    #button_calc {/*計算ボタン*/
-      padding: 8px 16px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body>
 
+<body>
+<!-- タイトル -->
 <div class="TITLE_AREA">
   <h1>その一皿、いくら？</h1>
-  <p class="desc">一食あたりの食費を計算できるツール。</p>
-  <p class="desc">食費を厳密に管理したい、自炊を頑張るあなたに。気ままに更新します。</p>
+  <p>一食あたりの食費を計算できるツール。</p>
+  <p>食費を厳密に管理したい、自炊を頑張るあなたに。気ままに更新します。</p>
 </div>
 
-<div class="BOX">
-  <h3>① 食材の情報</h3>
-  <p class="desc">購入したときの価格と内容量を入力</p>
+<!-- 本文 -->
+<div class="container">
+  <!-- 人前 -->
+  <div class="servings">
+    レシピ：
+    <input type="text" id="people">
+    人前
+  </div>
 
-  <p>価格（円）</p>
-  <input type="text" id="price" placeholder="例：298">
-  <div id="priceError" class="error"></div>
+  <!-- ヘッダー -->
+  <div class="header">
+    <div class="name">食材名</div>
+    <div class="price">価格</div>
+    <div class="total">内容量</div>
+    <div class="used">使用量</div>
+  </div>
 
-  <p>内容量（g、mL、個など）</p>
-  <input type="text" id="total" placeholder="例：10">
-  <div id="totalError" class="error"></div>
-</div>
+  <!-- 食材リスト -->
+  <div id="ingredient-list"></div>
 
-<div class="BOX">
-  <h3>② 使う量</h3>
-  <p class="desc">レシピで使う量と想定人数を入力</p>
+  <!-- 追加ボタン -->
+  <button class="add-btn" onclick="addRow()">＋ 食材を追加する</button>
 
-  <p>使用量（g、mL、個など）</p>
-  <input type="text" id="used" placeholder="例：3">
-  <div id="usedError" class="error"></div>
-  
-  <p>人前</p>
-  <input type="text" id="people" placeholder="例：2">
-  <div id="peopleError" class="error"></div>
-</div>
+  <br>
 
-<div class="RESULT_AREA">
-  <button onclick="calc()" id="button_calc">計算する</button>
-  <h3 id="result"></h3>
+  <!-- 計算ボタン -->
+  <button onclick="calculate()">計算する</button>
+
+  <!-- 結果 -->
+  <div class="result" id="result"></div>
+
 </div>
 
 <script>
-const fields = ["price", "total", "used", "people"];
-
-// 各inputにイベント追加（フォーカス外れた時）
-fields.forEach(id => {
-  const el = document.getElementById(id);
-  el.addEventListener("blur", () => {
-    validateField(id);
-    formatNumber(id);
-  });
+document.getElementById("people").addEventListener("blur", function() {
+  formatInput(this);
 });
 
-//入力形式が適切か判定する
-//未入力or数値じゃないor1未満
-function validateField(id) {
-  const el = document.getElementById(id);
-  const errorEl = document.getElementById(id + "Error");
-  const raw = el.value;
-  const value = normalizeNumber(raw);
+function normalizeNumber(value) {
+  value = value.replace(/[０-９]/g, s =>
+    String.fromCharCode(s.charCodeAt(0) - 65248)
+  );
+  value = value.replace(/,/g, "");
+  return value;
+}
 
-  el.style.border = "";
-  errorEl.innerText = "";
+function createRow() {
+  const row = document.createElement("div");
+  row.className = "row";
 
-  // 未入力
-  if (value === "") {
-    el.style.border = "2px solid red";
-    errorEl.innerText = "未入力です！";
-    return false;
+  row.innerHTML = `
+    <input class="name" placeholder="例：卵">
+    <input class="price" placeholder="298">
+    <input class="total" placeholder="10">
+    <input class="used" placeholder="1">
+  `;
+
+  // 数値項目にイベント付与
+  const inputs = row.querySelectorAll(".price, .total, .used");
+
+  inputs.forEach(input => {
+    input.addEventListener("blur", function() {
+      formatInput(this);
+    });
+  });
+
+  return row;
+}
+
+function addRow() {
+  const list = document.getElementById("ingredient-list");
+  const newRow = createRow();
+
+  list.appendChild(newRow);
+}
+
+function calculate() {
+  let hasError = false;
+  let firstErrorEl = null;
+
+  // 人前
+  const peopleEl = document.getElementById("people");
+  const peopleVal = normalizeNumber(peopleEl.value);
+  const people = Number(peopleVal);
+
+  peopleEl.classList.remove("error");
+
+  if (!people || people < 1) {
+    peopleEl.classList.add("error");
+    hasError = true;
+    if (!firstErrorEl) firstErrorEl = peopleEl;
   }
 
-const num = Number(value);
+  const rows = document.querySelectorAll("#ingredient-list .row");
+  let totalCost = 0;
 
-// 数字チェック
-if (!/^[0-9]+$/.test(value) || num < 1) {
-  el.style.border = "2px solid red";
-  errorEl.innerText = "入力できるのは1以上の数です";
-  return false;
+  rows.forEach(row => {
+    const priceEl = row.querySelector(".price");
+    const totalEl = row.querySelector(".total");
+    const usedEl = row.querySelector(".used");
+
+    const inputs = [priceEl, totalEl, usedEl];
+
+    inputs.forEach(el => el.classList.remove("error"));
+
+    const price = Number(normalizeNumber(priceEl.value));
+    const total = Number(normalizeNumber(totalEl.value));
+    const used = Number(normalizeNumber(usedEl.value));
+
+    if (!price || price < 1) {
+      priceEl.classList.add("error");
+      hasError = true;
+      if (!firstErrorEl) firstErrorEl = priceEl;
+    }
+
+    if (!total || total < 1) {
+      totalEl.classList.add("error");
+      hasError = true;
+      if (!firstErrorEl) firstErrorEl = totalEl;
+    }
+
+    if (!used || used < 1) {
+      usedEl.classList.add("error");
+      hasError = true;
+      if (!firstErrorEl) firstErrorEl = usedEl;
+    }
+
+    if (!hasError) {
+      const cost = (price / total) * used;
+      totalCost += cost;
+    }
+  });
+
+  // エラー時
+  if (hasError) {
+    document.getElementById("result").innerText =
+      "1以上の数字を入力してください";
+
+    if (firstErrorEl) {
+      firstErrorEl.focus();
+    }
+
+    return;
+  }
+
+  // 正常時
+  const perPerson = totalCost / people;
+
+  document.getElementById("result").innerText =
+    "一人前あたり：約 " + perPerson.toFixed(1) + " 円";
 }
+
+function validateInput(el) {
+  const value = normalizeNumber(el.value);
+
+  // 未入力
+  if (value === "") return false;
+
+  // 数値チェック
+  if (!/^[0-9]+$/.test(value) || Number(value) < 1) return false;
 
   return true;
 }
 
-//1食あたりの費用を計算
-function calc() {
-  let isValid = true;
+function formatInput(el) {
+  const value = normalizeNumber(el.value);
 
-  // 全項目チェック
-  fields.forEach(id => {
-    if (!validateField(id)) {
-      isValid = false;
-    }
-  });
-
-  // エラーがあれば計算しない
-  if (!isValid) {
-    document.getElementById("result").innerText = "";
-    return;
+  if (/^[0-9]+$/.test(value)) {
+    el.value = Number(value).toLocaleString();
   }
-
-  const price = Number(document.getElementById("price").value.replace(/,/g, ""));
-  const total = Number(document.getElementById("total").value.replace(/,/g, ""));
-  const used = Number(document.getElementById("used").value.replace(/,/g, ""));
-  const people = Number(document.getElementById("people").value.replace(/,/g, ""));
-
-  const cost = (price / total) * used / people;
-
-  document.getElementById("result").innerText =
-    "一人前：" + Number(cost.toFixed(1)).toLocaleString() + "円";
 }
 
-//入力欄をコンマ区切りにする
-function formatNumber(id) {
-  const el = document.getElementById(id);
-  let value = normalizeNumber(el.value);
-
-  if (!value || isNaN(value)) return;
-
-  el.value = Number(value).toLocaleString();
-}
-
-//入力成型
-function normalizeNumber(value) {
-  // 全角→半角
-  value = value.replace(/[０-９]/g, s =>
-    String.fromCharCode(s.charCodeAt(0) - 65248)
-  );
-
-  // カンマ削除
-  value = value.replace(/,/g, "");
-
-  return value;
-}
+// 初期行
+addRow();
 </script>
 
 </body>
