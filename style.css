@@ -7,35 +7,32 @@ body {
     sans-serif;
 }
 
-.TITLE_AREA {/*タイトル*/
+/*タイトル*/
+.title-area {
   margin: 10px 0px 20px 0px;
 }
 
-.TITLE_AREA h1 {/*タイトル*/
+.title-area h1 {
   margin: 0px 0px 5px 0px;
 }
 
-.TITLE_AREA p {/*タイトル*/
+.title-area p {
   font-size: 13px;
   color: #666;
   margin: 0px 0px 0px 0px;
 }
 
+/*本文全体*/
 .container {
+  width: 100%;
   max-width: 500px;
   margin: auto;
 }
 
-.servings {
-  margin-bottom: 15px;
-}
-
+/*入力ボックス全般*/
 input {
   border: 1px solid #ccc;
   padding: 3px;
-  margin: 2px;
-  width: 30px;
-  box-sizing: border-box;
   transition: all 0.15s ease;
 }
 
@@ -55,7 +52,21 @@ input.error:focus {
   box-shadow: 0 0 4px rgba(255, 77, 77, 0.5);
 }
 
+/*〇人前*/
+.servings {
+  /* background-color: blue; */
+  display: flex;
+  margin-bottom: 15px;
+}
+
+.servings input {
+  margin: 2px;
+  width: 2em;
+}
+
+/*ヘッダー*/
 .header {
+  /* background-color: blue; */
   font-weight: bold;
   display: flex;
   align-items: center;
@@ -65,56 +76,40 @@ input.error:focus {
 .header div {
   background-color: #f5f5f5;
   border-radius: 4px;
-  box-sizing: border-box;
   padding: 3px;
-  margin: 0px 6.5px 0px 2px;/*右の余白は微調整*/
   text-align: center;
 }
 
- .name {
-  width: 120px;
-  /* background-color: brown */
+/*食材、価格、内容量、使用量*/
+.row {
+  /* background-color: plum; */
+  width: 100%;
+  display: flex;
+  margin-bottom: 5px;
 }
 
-/* .price{
-  width: 80px;
-  background-color: red
+.name {
+  /* background-color: green; */
+  width: 26%;
+  margin: 0% 1% 0% 1%
 }
-.total{
-  width: 80px;
-  background-color: blue
-}
-.used {
-  width: 80px;
-  background-color: green
-} */
 
 .price,
 .total,
 .used {
-  width: 80px;
+  /* background-color: red; */
+  width: 22%;
+  margin: 0% 1% 0% 1%
 }
 
+/*ボタン全般*/
 button {
   padding: 8px 12px;
   margin-top: 10px;
   cursor: pointer;
 }
 
-.add-btn {
-  margin-top: 10px;
-}
-
-/* .error {
-  background-color: #ffe6e6;
-} */
-
-.error-message {
-  font-size: 12px;
-  color: red;
-  margin: 0 4px;
-}
-
+/*計算結果*/
 .result {
   margin-top: 20px;
   font-weight: bold;
