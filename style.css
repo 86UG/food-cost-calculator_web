@@ -80,6 +80,12 @@ input.error:focus {
   text-align: center;
 }
 
+.header div.name {
+  /* background-color: green; */
+  width: 24%;
+  margin: 0% 1% 0% 6%/*xボタン分だけ左に余白*/
+}
+
 /*食材、価格、内容量、使用量*/
 .row {
   /* background-color: plum; */
@@ -90,7 +96,7 @@ input.error:focus {
 
 .name {
   /* background-color: green; */
-  width: 26%;
+  width: 24%;
   margin: 0% 1% 0% 1%
 }
 
@@ -98,15 +104,35 @@ input.error:focus {
 .total,
 .used {
   /* background-color: red; */
-  width: 22%;
+  width: 21%;
   margin: 0% 1% 0% 1%
 }
 
 /*ボタン全般*/
 button {
-  padding: 8px 12px;
-  margin-top: 10px;
   cursor: pointer;
+}
+
+.add-btn {
+  padding: 8px 12px;
+  margin: 0px 0px 10px 6%;
+}
+
+.calc-btn {
+  padding: 8px 12px;
+  margin: 10px 0px 10px 6%;
+}
+
+.delete-btn {
+  border: 1px solid #ccc;
+  background: #f5f5f5;
+  border-radius: 4px;
+  width: 5%;
+  margin: 0px 0px 0px 0px;
+}
+
+.delete-btn:hover {
+  background: #ffe6e6;
 }
 
 /*計算結果*/

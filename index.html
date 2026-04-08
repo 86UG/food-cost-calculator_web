@@ -43,7 +43,7 @@
   <br>
 
   <!-- 計算ボタン -->
-  <button onclick="calculate()">計算する</button>
+  <button class="calc-btn" onclick="calculate()">計算する</button>
 
   <!-- 結果 -->
   <div class="result" id="result"></div>
@@ -68,6 +68,7 @@ function createRow() {
   row.className = "row";
 
   row.innerHTML = `
+    <button class="delete-btn">×</button>
     <input class="name" placeholder="例：卵">
     <input class="price" placeholder="298">
     <input class="total" placeholder="10">
@@ -81,6 +82,18 @@ function createRow() {
     input.addEventListener("blur", function() {
       formatInput(this);
     });
+  });
+
+  //削除処理
+  row.querySelector(".delete-btn").addEventListener("click", function() {
+    const list = document.getElementById("ingredient-list");
+
+    row.remove();
+
+    // 行が0なら1行追加
+    if (list.children.length === 0) {
+      addRow();
+    }
   });
 
   return row;
