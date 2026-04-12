@@ -195,7 +195,7 @@ function calculate() {
   html += `
     <div class="result-row">
       <span class="name">${item.name}</span>
-      <span class="value">${item.cost.toFixed(1)}円</span>
+      <span class="value">${item.cost.toFixed(0)}円</span>
       <span class="ratio">（${ratio.toFixed(1)}%）</span>
     </div>
   `;
@@ -208,7 +208,7 @@ function calculate() {
   html += `
     <div class="result-row">
       <span class="name">合計：</span>
-      <span class="value">${totalCost.toFixed(1)}円</span>
+      <span class="value">${totalCost.toFixed(0)}円</span>
       <span class="ratio"></span>
     </div>
   `;
@@ -217,7 +217,7 @@ function calculate() {
   html += `
     <div class="result-row perPerson">
       <span class="name">一人前：</span>
-      <span class="value">${(totalCost / people).toFixed(1)}円</span>
+      <span class="value">${(totalCost / people).toFixed(0)}円</span>
       <span class="ratio"></span>
     </div>
   `;
