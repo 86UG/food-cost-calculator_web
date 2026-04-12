@@ -9,9 +9,13 @@
   <link rel="stylesheet" href="style.css">
 </head>
 
+<!-- デバッグon -->
+<!-- <body class="debug"> -->
+<!-- デバッグoff -->
 <body>
-<!-- タイトル -->
-<div class="title-area">
+
+  <!-- タイトル -->
+<div id="title-area">
   <h1>その一皿、いくら？</h1>
   <p>食材の価格・内容量とレシピに使う分量を入力すると一人前の食費がわかります。</p>
   <p>食費を厳密に管理したい、自炊を頑張るあなたに。気ままに更新します。</p>
@@ -125,6 +129,7 @@ function calculate() {
 
   const rows = document.querySelectorAll("#ingredient-list .row");
   let totalCost = 0;
+  let breakdown = [];
 
   rows.forEach(row => {
     const priceEl = row.querySelector(".price");
@@ -158,7 +163,9 @@ function calculate() {
     }
 
     if (!hasError) {
+      const name = row.querySelector(".name").value || "（無名の食材）";
       const cost = (price / total) * used;
+      breakdown.push({ name, cost });
       totalCost += cost;
     }
   });
@@ -176,10 +183,27 @@ function calculate() {
   }
 
   // 正常時
-  const perPerson = totalCost / people;
+  const resultEl = document.getElementById("result");
+  let html = "";
 
-  document.getElementById("result").innerText =
-    "一人前あたり：" + perPerson.toFixed(1) + " 円";
+  // 内訳
+  breakdown.sort((a, b) => b.cost - a.cost); // 高い順にソート
+  breakdown.forEach(item => {
+    const ratio = (item.cost / totalCost) * 100;
+    html += `${item.name}：${item.cost.toFixed(1)} 円（${ratio.toFixed(1)}%）<br>`;
+  });
+
+  // 区切り
+  html += "<hr>";
+
+  // 合計
+  html += `合計：${totalCost.toFixed(1)} 円<br>`;
+
+  // 一人前
+  const perPerson = totalCost / people;
+  html += `一人前：${perPerson.toFixed(1)} 円`;
+
+  resultEl.innerHTML = html;
 }
 
 function validateInput(el) {

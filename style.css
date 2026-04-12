@@ -7,16 +7,17 @@ body {
     sans-serif;
 }
 
+/* デバッグ用背景色 */
+.debug .header { background: rgba(255,0,0,0.5); }
+.debug .row { background: rgba(0,255,0,0.5); }
+.debug input { background: rgba(0,0,255,0.5); }
+
 /*タイトル*/
-.title-area {
-  margin: 10px 0px 20px 0px;
-}
+#title-area { margin: 10px 0px 20px 0px; }
 
-.title-area h1 {
-  margin: 0px 0px 5px 0px;
-}
+#title-area h1 { margin: 0px 0px 5px 0px; }
 
-.title-area p {
+#title-area p {
   font-size: 13px;
   color: #666;
   margin: 0px 0px 0px 0px;
@@ -24,6 +25,7 @@ body {
 
 /*本文全体*/
 .container {
+  box-sizing: border-box;
   width: 100%;
   max-width: 500px;
   margin: auto;
@@ -43,9 +45,7 @@ input:focus {
   box-shadow: 0 0 4px rgba(74, 144, 226, 0.5);
 }
 
-input.error {
-  background-color: #ffe6e6;
-}
+input.error { background-color: #ffe6e6; }
 
 input.error:focus {
   border: 1px solid #ff4d4d;
@@ -54,7 +54,6 @@ input.error:focus {
 
 /*〇人前*/
 .servings {
-  /* background-color: blue; */
   display: flex;
   margin-bottom: 15px;
 }
@@ -66,7 +65,6 @@ input.error:focus {
 
 /*ヘッダー*/
 .header {
-  /* background-color: blue; */
   font-weight: bold;
   display: flex;
   align-items: center;
@@ -81,21 +79,18 @@ input.error:focus {
 }
 
 .header div.name {
-  /* background-color: green; */
   width: 24%;
-  margin: 0% 1% 0% 6%/*xボタン分だけ左に余白*/
+  margin: 0% 1% 0% 6%/*xボタン分だけ左に余白：ボタン幅5%+入力ボックス左余白1%*/
 }
 
 /*食材、価格、内容量、使用量*/
 .row {
-  /* background-color: plum; */
   width: 100%;
   display: flex;
   margin-bottom: 5px;
 }
 
 .name {
-  /* background-color: green; */
   width: 24%;
   margin: 0% 1% 0% 1%
 }
@@ -103,15 +98,12 @@ input.error:focus {
 .price,
 .total,
 .used {
-  /* background-color: red; */
   width: 21%;
   margin: 0% 1% 0% 1%
 }
 
 /*ボタン全般*/
-button {
-  cursor: pointer;
-}
+button { cursor: pointer; }
 
 .add-btn {
   padding: 8px 12px;
@@ -137,7 +129,7 @@ button {
 
 /*計算結果*/
 .result {
-  margin-top: 20px;
+  margin: 0px 0px 0px 6%;
   font-weight: bold;
   min-height: 24px;
 }
