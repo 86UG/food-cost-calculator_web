@@ -163,7 +163,8 @@ function calculate() {
     }
 
     if (!hasError) {
-      const name = row.querySelector(".name").value || "（無名の食材）";
+      let name = row.querySelector(".name").value || "（名無しの食材）";
+      name += "：";
       const cost = (price / total) * used;
       breakdown.push({ name, cost });
       totalCost += cost;
@@ -190,18 +191,36 @@ function calculate() {
   breakdown.sort((a, b) => b.cost - a.cost); // 高い順にソート
   breakdown.forEach(item => {
     const ratio = (item.cost / totalCost) * 100;
-    html += `${item.name}：${item.cost.toFixed(1)} 円（${ratio.toFixed(1)}%）<br>`;
+    // html += `${item.name}：${item.cost.toFixed(1)}円（${ratio.toFixed(1)}%）<br>`;
+  html += `
+    <div class="result-row">
+      <span class="name">${item.name}</span>
+      <span class="value">${item.cost.toFixed(1)}円</span>
+      <span class="ratio">（${ratio.toFixed(1)}%）</span>
+    </div>
+  `;
   });
 
   // 区切り
   html += "<hr>";
 
   // 合計
-  html += `合計：${totalCost.toFixed(1)} 円<br>`;
+  html += `
+    <div class="result-row">
+      <span class="name">合計：</span>
+      <span class="value">${totalCost.toFixed(1)}円</span>
+      <span class="ratio"></span>
+    </div>
+  `;
 
   // 一人前
-  const perPerson = totalCost / people;
-  html += `一人前：${perPerson.toFixed(1)} 円`;
+  html += `
+    <div class="result-row perPerson">
+      <span class="name">一人前：</span>
+      <span class="value">${(totalCost / people).toFixed(1)}円</span>
+      <span class="ratio"></span>
+    </div>
+  `;
 
   resultEl.innerHTML = html;
 }

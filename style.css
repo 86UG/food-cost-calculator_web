@@ -11,6 +11,9 @@ body {
 .debug .header { background: rgba(255,0,0,0.5); }
 .debug .row { background: rgba(0,255,0,0.5); }
 .debug input { background: rgba(0,0,255,0.5); }
+.debug .result-row .name { background: rgba(255,255,0,0.5); }
+.debug .result-row .value { background: rgba(0,255,255,0.5); }
+.debug .result-row .ratio { background: rgba(255,0,255,0.5); }
 
 /*タイトル*/
 #title-area { margin: 10px 0px 20px 0px; }
@@ -43,6 +46,10 @@ input:focus {
   border: 1px solid #4a90e2;
   background-color: #f0f8ff;
   box-shadow: 0 0 4px rgba(74, 144, 226, 0.5);
+}
+
+input::placeholder {
+  color: #aaa;
 }
 
 input.error { background-color: #ffe6e6; }
@@ -121,15 +128,44 @@ button { cursor: pointer; }
   border-radius: 4px;
   width: 5%;
   margin: 0px 0px 0px 0px;
+  opacity: 0.6;
 }
 
 .delete-btn:hover {
   background: #ffe6e6;
+  opacity: 1;
 }
 
 /*計算結果*/
-.result {
+#result {
   margin: 0px 0px 0px 6%;
-  font-weight: bold;
   min-height: 24px;
+}
+
+.result-row {
+  display: flex; 
+  justify-content: left; 
+}
+
+#result .name {
+  display: inline-block;
+  text-align: right;
+  width: 40%;
+}
+
+#result .value {
+  display: inline-block;
+  text-align: right;
+  width: 20%;
+}
+
+#result .ratio {
+  display: inline-block;
+  text-align: right;
+  width: 20%;
+}
+
+#result .perPerson {
+  font-size: 18px;
+  font-weight: bold;
 }
