@@ -26,7 +26,7 @@
   <!-- 人前 -->
   <div class="servings">
     レシピ：
-    <input type="text" id="people">
+    <input type="text" id="people" inputmode="numeric">
     人前
   </div>
 
@@ -73,10 +73,10 @@ function createRow() {
 
   row.innerHTML = `
     <button class="delete-btn">×</button>
-    <input class="name" placeholder="例：卵">
-    <input class="price" placeholder="298">
-    <input class="total" placeholder="10">
-    <input class="used" placeholder="1">
+    <input class="name" inputmode="numeric" placeholder="例：卵">
+    <input class="price" inputmode="numeric" placeholder="298">
+    <input class="total" inputmode="numeric" placeholder="10">
+    <input class="used" inputmode="numeric" placeholder="1">
   `;
 
   // 数値項目にイベント付与
