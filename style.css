@@ -150,13 +150,13 @@ button { cursor: pointer; }
 #result .name {
   display: inline-block;
   text-align: right;
-  width: 40%;
+  width: 45%;
 }
 
 #result .value {
   display: inline-block;
   text-align: right;
-  width: 20%;
+  width: 30%;
 }
 
 #result .ratio {
