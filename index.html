@@ -26,7 +26,7 @@
   <!-- 人前 -->
   <div class="servings">
     レシピ：
-    <input type="text" id="people" inputmode="numeric">
+    <input type="text" id="people" inputmode="decimal">
     人前
   </div>
 
@@ -74,9 +74,9 @@ function createRow() {
   row.innerHTML = `
     <button class="delete-btn">×</button>
     <input class="name" placeholder="例：卵">
-    <input class="price" inputmode="numeric" placeholder="298">
-    <input class="total" inputmode="numeric" placeholder="10">
-    <input class="used" inputmode="numeric" placeholder="1">
+    <input class="price" inputmode="decimal" placeholder="298">
+    <input class="total" inputmode="decimal" placeholder="10">
+    <input class="used" inputmode="decimal" placeholder="1">
   `;
 
   // 数値項目にイベント付与
@@ -121,7 +121,8 @@ function calculate() {
 
   peopleEl.classList.remove("error");
 
-  if (!people || people < 1) {
+  //  人前チェック 0以下の数字をはじく
+  if (!people || people <= 0) {
     peopleEl.classList.add("error");
     hasError = true;
     if (!firstErrorEl) firstErrorEl = peopleEl;
@@ -144,19 +145,22 @@ function calculate() {
     const total = Number(normalizeNumber(totalEl.value));
     const used = Number(normalizeNumber(usedEl.value));
 
-    if (!price || price < 1) {
+    //  価格チェック 0以下の数字をはじく
+    if (!price || price <= 0) {
       priceEl.classList.add("error");
       hasError = true;
       if (!firstErrorEl) firstErrorEl = priceEl;
     }
 
-    if (!total || total < 1) {
+    //  内容量チェック 0以下の数字をはじく
+    if (!total || total <= 0) {
       totalEl.classList.add("error");
       hasError = true;
       if (!firstErrorEl) firstErrorEl = totalEl;
     }
 
-    if (!used || used < 1) {
+    //  使用量チェック 0以下の数字をはじく
+    if (!used || used <= 0) {
       usedEl.classList.add("error");
       hasError = true;
       if (!firstErrorEl) firstErrorEl = usedEl;
@@ -174,7 +178,7 @@ function calculate() {
   // エラー時
   if (hasError) {
     document.getElementById("result").innerText =
-      "1以上の数字を入力してください";
+      "0より大きい数字を入力してください";
 
     if (firstErrorEl) {
       firstErrorEl.focus();
