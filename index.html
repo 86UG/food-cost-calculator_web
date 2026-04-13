@@ -39,7 +39,7 @@
   </div>
 
   <!-- 食材リスト -->
-  <div id="ingredient-list"></div>
+  <div id="ingredient-row"></div>
 
   <!-- 追加ボタン -->
   <button class="add-btn" onclick="addRow()">＋ 食材を追加する</button>
@@ -54,10 +54,15 @@
 
 </div>
 
+<datalist id="ingredient-list"></datalist>
+
 <script>
 document.getElementById("people").addEventListener("blur", function() {
   formatInput(this);
 });
+
+// 食材リスト読み込み
+loadIngredientList();
 
 function normalizeNumber(value) {
   value = value.replace(/[０-９]/g, s =>
@@ -73,10 +78,11 @@ function createRow() {
 
   row.innerHTML = `
     <button class="delete-btn">×</button>
-    <input class="name" placeholder="例：卵">
+    <input class="name" list="ingredient-list" placeholder="例：卵">
     <input class="price" inputmode="decimal" placeholder="298">
     <input class="total" inputmode="decimal" placeholder="10">
     <input class="used" inputmode="decimal" placeholder="1">
+    <button class="save-btn">登録</button>
   `;
 
   // 数値項目にイベント付与
@@ -88,9 +94,9 @@ function createRow() {
     });
   });
 
-  //削除処理
+  //削除ボタン処理
   row.querySelector(".delete-btn").addEventListener("click", function() {
-    const list = document.getElementById("ingredient-list");
+    const list = document.getElementById("ingredient-row");
 
     row.remove();
 
@@ -100,11 +106,62 @@ function createRow() {
     }
   });
 
+  // 登録ボタン処理
+  row.querySelector(".save-btn").addEventListener("click", function() {
+    const name = row.querySelector(".name").value.trim();
+    const price = normalizeNumber(row.querySelector(".price").value);
+    const total = normalizeNumber(row.querySelector(".total").value);
+
+    // バリデーション
+    if (!name || !price || !total) {
+      alert("食材名・価格・内容量を入力してください");
+      return;
+    }
+
+    const ingredient = {
+      name: name,
+      price: Number(price),
+      total: Number(total)
+    };
+
+    // 既存データ取得
+    const saved = JSON.parse(localStorage.getItem("ingredients") || "[]");
+
+    // 同名があれば上書き
+    const index = saved.findIndex(i => i.name === name);
+
+    if (index !== -1) {
+      saved[index] = ingredient;
+    } else {
+      saved.push(ingredient);
+    }
+
+    // 保存
+    localStorage.setItem("ingredients", JSON.stringify(saved));
+
+    alert("登録しました");
+
+    // 即kリスト呼び出し
+    loadIngredientList();
+  });
+
+  // 食材選択時に自動入力
+  const nameInput = row.querySelector(".name");
+  nameInput.addEventListener("change", () => {
+    const data = JSON.parse(localStorage.getItem("ingredients") || "[]");
+    const selected = data.find(i => i.name === nameInput.value);
+
+    if (selected) {
+      row.querySelector(".price").value = selected.price;
+      row.querySelector(".total").value = selected.total;
+    }
+  });
+
   return row;
 }
 
 function addRow() {
-  const list = document.getElementById("ingredient-list");
+  const list = document.getElementById("ingredient-row");
   const newRow = createRow();
 
   list.appendChild(newRow);
@@ -128,7 +185,7 @@ function calculate() {
     if (!firstErrorEl) firstErrorEl = peopleEl;
   }
 
-  const rows = document.querySelectorAll("#ingredient-list .row");
+  const rows = document.querySelectorAll("#ingredient-row .row");
   let totalCost = 0;
   let breakdown = [];
 
@@ -195,14 +252,13 @@ function calculate() {
   breakdown.sort((a, b) => b.cost - a.cost); // 高い順にソート
   breakdown.forEach(item => {
     const ratio = (item.cost / totalCost) * 100;
-    // html += `${item.name}：${item.cost.toFixed(1)}円（${ratio.toFixed(1)}%）<br>`;
-  html += `
-    <div class="result-row">
-      <span class="name">${item.name}</span>
-      <span class="value">${item.cost.toFixed(0)}円</span>
-      <span class="ratio">（${ratio.toFixed(1)}%）</span>
-    </div>
-  `;
+    html += `
+      <div class="result-row">
+        <span class="name">${item.name}</span>
+        <span class="value">${item.cost.toFixed(0)}円</span>
+        <span class="ratio">（${ratio.toFixed(1)}%）</span>
+      </div>
+    `;
   });
 
   // 区切り
@@ -247,6 +303,13 @@ function formatInput(el) {
   if (/^[0-9]+$/.test(value)) {
     el.value = Number(value).toLocaleString();
   }
+}
+
+function loadIngredientList() {
+  const list = document.getElementById("ingredient-list");
+  const data = JSON.parse(localStorage.getItem("ingredients") || "[]");
+
+  list.innerHTML = data.map(i => `<option value="${i.name}">`).join("");
 }
 
 // 初期行
