@@ -113,6 +113,8 @@ input.error:focus {
 button {
   cursor: pointer;
   border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #f5f5f5;
 }
 
 .add-btn {
@@ -125,10 +127,11 @@ button {
   margin: 10px 0px 10px 6%;
 }
 
+.calc-btn:hover {
+  background: #b0d5ff;
+}
+
 .delete-btn {
-  border: 1px solid #ccc;
-  background: #f5f5f5;
-  /* border-radius: 4px; */
   width: 5%;
   margin: 0px 0px 0px 0px;
   opacity: 0.6;
