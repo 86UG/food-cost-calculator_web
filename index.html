@@ -1,386 +1,60 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="食材の価格・内容量・使用量から一人前の食費を自動計算。複数食材にも対応した無料の食費計算ツール。自炊・節約・家計管理に。">
-  <meta name="google-site-verification" content="JUQzpSWXDlmY2dKkkwU9a716EybnjabIKuK38MrQCgc" />
-  <title>その一皿、いくら？｜食費計算・一人前コスト計算ツール</title>
-  <link rel="stylesheet" href="style.css">
-</head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="食材の価格・内容量・使用量から一人前の食費を自動計算。複数食材にも対応した無料の食費計算ツール。自炊・節約・家計管理に。">
+    <meta name="google-site-verification" content="JUQzpSWXDlmY2dKkkwU9a716EybnjabIKuK38MrQCgc" />
+    <title>その一皿、いくら？｜食費計算・一人前コスト計算ツール</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
 
-<!-- デバッグon -->
-<!-- <body class="debug"> -->
-<!-- デバッグoff -->
-<body>
+  <!-- デバッグon -->
+  <!-- <body class="debug"> -->
+  <!-- デバッグoff -->
+  <body>
 
-  <!-- タイトル -->
-<div id="title-area">
-  <h1>その一皿、いくら？</h1>
-  <p>食材の価格・内容量・使用量を入力すると一人前の費用がわかります。</p>
-  <p>食費を厳密に管理したい、節約を頑張るあなたに。</p>
-</div>
+      <!-- タイトル -->
+    <div id="title-area">
+      <h1>その一皿、いくら？</h1>
+      <p>食材の価格・内容量・使用量を入力すると一人前の費用がわかります。</p>
+      <p>食費を厳密に管理したい、節約を頑張るあなたに。</p>
+    </div>
 
-<!-- 本文 -->
-<div class="container">
-  <!-- 人前 -->
-  <div class="servings">
-    レシピ：
-    <input type="text" id="people" inputmode="decimal">
-    人前
-  </div>
-
-  <!-- ヘッダー -->
-  <div class="header">
-    <div class="name">食材名</div>
-    <div class="price">価格</div>
-    <div class="total">内容量</div>
-    <div class="used">使用量</div>
-  </div>
-
-  <!-- 食材リスト -->
-  <div id="ingredient-row"></div>
-
-  <!-- 追加ボタン -->
-  <button class="add-btn" onclick="addRow()">＋ 食材を追加する</button>
-
-  <br>
-
-  <!-- 計算ボタン -->
-  <button class="calc-btn" onclick="calculate()">計算する</button>
-
-  <!-- 結果 -->
-  <div class="result" id="result"></div>
-
-</div>
-
-<datalist id="ingredient-list"></datalist>
-
-<script>
-const isMobile = /iPhone|Android/.test(navigator.userAgent);
-
-document.getElementById("people").addEventListener("blur", function() {
-  formatInput(this);
-});
-
-// 食材リスト読み込み
-loadIngredientList();
-
-function normalizeNumber(value) {
-  value = value.replace(/[０-９]/g, s =>
-    String.fromCharCode(s.charCodeAt(0) - 65248)
-  );
-  value = value.replace(/,/g, "");
-  return value;
-}
-
-function createRow() {
-  const row = document.createElement("div");
-  row.className = "row";
-
-  if (isMobile) {
-    // スマホ：select
-    row.innerHTML = `
-      <button class="delete-btn">×</button>
-      <select class="name-select"></select>
-      <input class="price" inputmode="numeric" placeholder="298">
-      <input class="total" inputmode="numeric" placeholder="10">
-      <input class="used" inputmode="numeric" placeholder="1">
-      <button class="save-btn">登録</button>
-    `;
-  } else {
-    // PC：datalist
-    row.innerHTML = `
-      <button class="delete-btn">×</button>
-      <input class="name" list="ingredient-list" placeholder="例：卵">
-      <input class="price" inputmode="numeric" placeholder="298">
-      <input class="total" inputmode="numeric" placeholder="10">
-      <input class="used" inputmode="numeric" placeholder="1">
-      <button class="save-btn">登録</button>
-    `;
-  }
-
-  // 数値項目にイベント付与
-  const inputs = row.querySelectorAll(".price, .total, .used");
-  // フォーマット整える
-  inputs.forEach(input => {
-    input.addEventListener("blur", function() {
-      formatInput(this);
-    });
-  });
-
-  setupRowEvents(row);
-  // document.getElementById("ingredient-row").appendChild(row);
-
-  //削除ボタン処理
-  // row.querySelector(".delete-btn").addEventListener("click", function() {
-  //   const list = document.getElementById("ingredient-row");
-
-  //   row.remove();
-
-  //   // 行が0なら1行追加
-  //   if (list.children.length === 0) {
-  //     addRow();
-  //   }
-  // });
-
-  // 登録ボタン処理
-  row.querySelector(".save-btn").addEventListener("click", function() {
-    const nameEl = isMobile
-      ? row.querySelector(".name-select")
-      : row.querySelector(".name");
-    const name = nameEl.value.trim();
-    const price = normalizeNumber(row.querySelector(".price").value);
-    const total = normalizeNumber(row.querySelector(".total").value);
-
-    // バリデーション
-    if (!name || !price || !total) {
-      alert("食材名・価格・内容量を入力してください");
-      return;
-    }
-
-    const ingredient = {
-      name: name,
-      price: Number(price),
-      total: Number(total)
-    };
-
-    // 既存データ取得
-    const saved = JSON.parse(localStorage.getItem("ingredients") || "[]");
-
-    // 同名があれば上書き
-    const index = saved.findIndex(i => i.name === name);
-
-    if (index !== -1) {
-      saved[index] = ingredient;
-    } else {
-      saved.push(ingredient);
-    }
-
-    // 保存
-    localStorage.setItem("ingredients", JSON.stringify(saved));
-
-    alert("登録しました");
-
-    // 即リスト呼び出し
-    if (isMobile) {
-      document.querySelectorAll(".name-select").forEach(loadIngredientSelect);
-    } else {
-      loadIngredientList();
-    }
-  });
-
-  return row;
-}
-
-function addRow() {
-  const list = document.getElementById("ingredient-row");
-  const newRow = createRow();
-
-  list.appendChild(newRow);
-}
-
-function calculate() {
-  let hasError = false;
-  let firstErrorEl = null;
-
-  // 人前
-  const peopleEl = document.getElementById("people");
-  const peopleVal = normalizeNumber(peopleEl.value);
-  const people = Number(peopleVal);
-
-  peopleEl.classList.remove("error");
-
-  //  人前チェック 0以下の数字をはじく
-  if (!people || people <= 0) {
-    peopleEl.classList.add("error");
-    hasError = true;
-    if (!firstErrorEl) firstErrorEl = peopleEl;
-  }
-
-  const rows = document.querySelectorAll("#ingredient-row .row");
-  let totalCost = 0;
-  let breakdown = [];
-
-  rows.forEach(row => {
-    const priceEl = row.querySelector(".price");
-    const totalEl = row.querySelector(".total");
-    const usedEl = row.querySelector(".used");
-
-    const inputs = [priceEl, totalEl, usedEl];
-
-    inputs.forEach(el => el.classList.remove("error"));
-
-    const price = Number(normalizeNumber(priceEl.value));
-    const total = Number(normalizeNumber(totalEl.value));
-    const used = Number(normalizeNumber(usedEl.value));
-
-    //  価格チェック 0以下の数字をはじく
-    if (!price || price <= 0) {
-      priceEl.classList.add("error");
-      hasError = true;
-      if (!firstErrorEl) firstErrorEl = priceEl;
-    }
-
-    //  内容量チェック 0以下の数字をはじく
-    if (!total || total <= 0) {
-      totalEl.classList.add("error");
-      hasError = true;
-      if (!firstErrorEl) firstErrorEl = totalEl;
-    }
-
-    //  使用量チェック 0以下の数字をはじく
-    if (!used || used <= 0) {
-      usedEl.classList.add("error");
-      hasError = true;
-      if (!firstErrorEl) firstErrorEl = usedEl;
-    }
-
-    if (!hasError) {
-      const nameEl = isMobile
-        ? row.querySelector(".name-select")
-        : row.querySelector(".name");
-      let name = nameEl.value || "（名無しの食材）";
-      name += "：";
-      const cost = (price / total) * used;
-      breakdown.push({ name, cost });
-      totalCost += cost;
-    }
-  });
-
-  // エラー時
-  if (hasError) {
-    document.getElementById("result").innerText =
-      "0より大きい数字を入力してください";
-
-    if (firstErrorEl) {
-      firstErrorEl.focus();
-    }
-
-    return;
-  }
-
-  // 正常時
-  const resultEl = document.getElementById("result");
-  let html = "";
-
-  // 内訳
-  breakdown.sort((a, b) => b.cost - a.cost); // 高い順にソート
-  breakdown.forEach(item => {
-    const ratio = (item.cost / totalCost) * 100;
-    html += `
-      <div class="result-row">
-        <span class="name">${item.name}</span>
-        <span class="value">${item.cost.toFixed(0)}円</span>
-        <span class="ratio">（${ratio.toFixed(1)}%）</span>
+    <!-- 本文 -->
+    <div class="container">
+      <!-- 人前 -->
+      <div class="servings">
+        レシピ：
+        <input type="text" id="people" inputmode="decimal">
+        人前
       </div>
-    `;
-  });
 
-  // 区切り
-  html += "<hr>";
+      <!-- ヘッダー -->
+      <div class="header">
+        <div class="name">食材名</div>
+        <div class="price">価格</div>
+        <div class="total">内容量</div>
+        <div class="used">使用量</div>
+      </div>
 
-  // 合計
-  html += `
-    <div class="result-row">
-      <span class="name">合計：</span>
-      <span class="value">${totalCost.toFixed(0)}円</span>
-      <span class="ratio"></span>
+      <!-- 食材リスト -->
+      <div id="ingredient-row"></div>
+
+      <!-- 追加ボタン -->
+      <button class="add-btn" onclick="addRow()">＋ 食材を追加する</button>
+
+      <br>
+
+      <!-- 計算ボタン -->
+      <button class="calc-btn" onclick="calculate()">計算する</button>
+
+      <!-- 結果 -->
+      <div class="result" id="result"></div>
+
     </div>
-  `;
 
-  // 一人前
-  html += `
-    <div class="result-row perPerson">
-      <span class="name">一人前：</span>
-      <span class="value">${(totalCost / people).toFixed(0)}円</span>
-      <span class="ratio"></span>
-    </div>
-  `;
+    <script src="main.js" defer></script>
 
-  resultEl.innerHTML = html;
-}
-
-function validateInput(el) {
-  const value = normalizeNumber(el.value);
-
-  // 未入力
-  if (value === "") return false;
-
-  // 数値チェック
-  if (!/^[0-9]+$/.test(value) || Number(value) < 1) return false;
-
-  return true;
-}
-
-function formatInput(el) {
-  const value = normalizeNumber(el.value);
-
-  if (/^[0-9]+$/.test(value)) {
-    el.value = Number(value).toLocaleString();
-  }
-}
-
-function loadIngredientSelect(select) {
-  const data = JSON.parse(localStorage.getItem("ingredients") || "[]");
-
-  select.innerHTML =
-    '<option value="">選択してください</option>' +
-    data.map(i => `<option value="${i.name}">${i.name}</option>`).join("");
-}
-
-function setupRowEvents(row) {
-  // const data = JSON.parse(localStorage.getItem("ingredients") || "[]");
-
-  if (isMobile) {
-    const select = row.querySelector(".name-select");
-    loadIngredientSelect(select);
-
-    select.addEventListener("change", () => {
-      const data = JSON.parse(localStorage.getItem("ingredients") || "[]");
-      const selected = data.find(i => i.name === select.value);
-      if (selected) {
-        row.querySelector(".price").value = Number(selected.price).toLocaleString();
-        row.querySelector(".total").value = Number(selected.total).toLocaleString();
-      }
-    });
-
-  } else {
-    const nameInput = row.querySelector(".name");
-
-    nameInput.addEventListener("change", () => {
-      const data = JSON.parse(localStorage.getItem("ingredients") || "[]");
-      const selected = data.find(i => i.name === nameInput.value);
-      if (selected) {
-        row.querySelector(".price").value = Number(selected.price).toLocaleString();
-        row.querySelector(".total").value = Number(selected.total).toLocaleString();
-      }
-    });
-  }
-
-  // 削除ボタン（共通）
-  row.querySelector(".delete-btn").addEventListener("click", function() {
-    const list = document.getElementById("ingredient-row");
-
-    row.remove();
-
-    // 行が0なら1行追加
-    if (list.children.length === 0) {
-      addRow();
-    }
-  });
-}
-
-function loadIngredientList() {
-  const list = document.getElementById("ingredient-list");
-  const data = JSON.parse(localStorage.getItem("ingredients") || "[]");
-
-  list.innerHTML = data.map(i => `<option value="${i.name}">`).join("");
-}
-
-// 初期行
-addRow();
-</script>
-
-</body>
+  </body>
 </html>
