@@ -100,14 +100,15 @@ input.error:focus {
 
 .name {
   width: 24%;
-  margin: 0% 1% 0% 1%
+  margin: 0% 1% 0% 1%;
 }
 
 .price,
 .total,
 .used {
   width: 17%;
-  margin: 0% 1% 0% 1%
+  margin: 0% 1% 0% 1%;
+  text-align: right;
 }
 
 /*ボタン全般*/
@@ -234,19 +235,21 @@ button {
 }
 
 .ing-name {
-  width: 30%;
+  width: 28%;
+  margin: 0 2% 0 0;
   text-align: left;
 }
 
-.ing-price {
-  width: 20%;
+.ing-price, .ing-total {
+  width: 18%;
+  margin: 0 2% 0 0;
   text-align: right;
 }
 
-.ing-total {
-  width: 20%;
+/* .ing-total {
+  width: 19%;
   text-align: right;
-}
+} */
 
 .ing-actions {
   width: 30%;
