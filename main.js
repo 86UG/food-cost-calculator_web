@@ -48,9 +48,9 @@ function createRow() {
       <input class="name" placeholder="例：卵" autocomplete="off">
       <ul class="suggestions hidden"></ul>
     </div>
-    <input class="price" inputmode="numeric" placeholder="298">
-    <input class="total" inputmode="numeric" placeholder="10">
-    <input class="used" inputmode="numeric" placeholder="1">
+    <input class="price" inputmode="decimal" placeholder="298">
+    <input class="total" inputmode="decimal" placeholder="10">
+    <input class="used" inputmode="decimal" placeholder="1">
     <button class="save-btn">登録</button>
   `;
 
@@ -112,7 +112,10 @@ function calculate() {
   const peopleEl = document.getElementById("people");
   const people = validatePositiveNumber(peopleEl);
 
-  if (people === null && !firstErrorEl) firstErrorEl = peopleEl;
+  if (people === null && !firstErrorEl) {
+    hasError = true;
+    firstErrorEl = peopleEl;
+  }
 
   const rows = document.querySelectorAll("#ingredient-row .row");
   let totalCost = 0;
@@ -305,25 +308,6 @@ function deleteIngredient(index) {
 }
 
 // 食材を編集
-// function editIngredient(index) {
-//   const data = JSON.parse(localStorage.getItem("ingredients") || "[]");
-//   const item = data[index];
-
-//   const name = prompt("食材名", item.name);
-//   const price = prompt("価格", item.price);
-//   const total = prompt("内容量", item.total);
-
-//   if (!name || !price || !total) return;
-
-//   data[index] = {
-//     name,
-//     price: Number(price),
-//     total: Number(total)
-//   };
-
-//   localStorage.setItem("ingredients", JSON.stringify(data));
-//   renderIngredientList();
-// }
 function editIngredient(index) {
   const data = JSON.parse(localStorage.getItem("ingredients") || "[]");
   const item = data[index];
@@ -362,12 +346,15 @@ function saveEdit(index) {
   const listEl = document.getElementById("ingredient-list");
   const row = listEl.children[index];
 
-  const name = row.querySelector(".ing-name").value.trim();
-  const price = row.querySelector(".ing-price").value;
-  const total = row.querySelector(".ing-total").value;
+  const name = row.querySelector(".ing-name").value.trim() || "（名無しの食材）";
+  const priceEl = row.querySelector(".ing-price");
+  const totalEl = row.querySelector(".ing-total");
 
-  if (!name || !price || !total) {
-    alert("すべて入力してください");
+  const price = validatePositiveNumber(priceEl);
+  const total = validatePositiveNumber(totalEl);
+
+  if (price === null || total === null) {
+    alert("0より大きい数字を入力してください");
     return;
   }
 
