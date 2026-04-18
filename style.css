@@ -30,7 +30,7 @@ body {
 .container {
   width: 100%;
   max-width: 500px;
-  margin: auto;
+  /* margin: auto; */
 }
 
 /*入力ボックス全般*/
@@ -195,6 +195,7 @@ button {
 }
 
 .suggestions {
+  font-size: 13px;
   position: absolute;
   top: 100%;
   left: 0;

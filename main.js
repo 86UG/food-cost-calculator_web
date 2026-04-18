@@ -5,6 +5,19 @@ document.getElementById("people").addEventListener("blur", function() {
 // 初期行
 addRow();
 
+// 食材一覧
+renderIngredientList();
+
+document.addEventListener("click", e => {
+  document.querySelectorAll(".suggestions").forEach(list => {
+    const wrapper = list.closest(".name-wrapper");
+
+    if (!wrapper.contains(e.target)) {
+      list.classList.add("hidden");
+    }
+  });
+});
+
 // 全角数字を半角に直す
 function normalizeNumber(value) {
   value = value.replace(/[０-９]/g, s =>
@@ -81,6 +94,7 @@ function setupSaveButton(row) {
 
     localStorage.setItem("ingredients", JSON.stringify(saved));
     alert("登録しました");
+    renderIngredientList()
   });
 }
 
@@ -226,6 +240,7 @@ function setupAutocomplete(row) {
       .forEach(i => {
         const li = document.createElement("li");
         li.textContent = i.name;
+        // li.textContent = `${i.name}（${i.price}円 / ${i.total}）`;
 
         li.addEventListener("click", () => {
           input.value = i.name;
@@ -243,9 +258,60 @@ function setupAutocomplete(row) {
   });
 
   // フォーカス外れたら閉じる（少し遅延）
-  document.addEventListener("click", e => {
-    if (!row.contains(e.target)) {
-      list.classList.add("hidden");
-    }
+  // document.addEventListener("click", e => {
+  //   if (!row.contains(e.target)) {
+  //     list.classList.add("hidden");
+  //   }
+  // });
+}
+
+// 食材一覧表示
+function renderIngredientList() {
+  const listEl = document.getElementById("ingredient-list");
+  const data = JSON.parse(localStorage.getItem("ingredients") || "[]");
+
+  listEl.innerHTML = "";
+
+  data.forEach((item, index) => {
+    const div = document.createElement("div");
+
+    div.innerHTML = `
+      <span>${item.name}（${item.price}円 / ${item.total}）</span>
+      <button onclick="editIngredient(${index})">編集</button>
+      <button onclick="deleteIngredient(${index})">削除</button>
+    `;
+
+    listEl.appendChild(div);
   });
+}
+
+// 食材一覧から削除
+function deleteIngredient(index) {
+  const data = JSON.parse(localStorage.getItem("ingredients") || "[]");
+
+  data.splice(index, 1);
+
+  localStorage.setItem("ingredients", JSON.stringify(data));
+  renderIngredientList();
+}
+
+// 食材を編集
+function editIngredient(index) {
+  const data = JSON.parse(localStorage.getItem("ingredients") || "[]");
+  const item = data[index];
+
+  const name = prompt("食材名", item.name);
+  const price = prompt("価格", item.price);
+  const total = prompt("内容量", item.total);
+
+  if (!name || !price || !total) return;
+
+  data[index] = {
+    name,
+    price: Number(price),
+    total: Number(total)
+  };
+
+  localStorage.setItem("ingredients", JSON.stringify(data));
+  renderIngredientList();
 }
