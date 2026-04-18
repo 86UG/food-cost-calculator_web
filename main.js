@@ -274,11 +274,20 @@ function renderIngredientList() {
 
   data.forEach((item, index) => {
     const div = document.createElement("div");
+    div.className = "ingredient-item";
+
+    // カンマ表示
+    const price = Number(item.price).toLocaleString();
+    const total = Number(item.total).toLocaleString();
 
     div.innerHTML = `
-      <span>${item.name}（${item.price}円 / ${item.total}）</span>
-      <button onclick="editIngredient(${index})">編集</button>
-      <button onclick="deleteIngredient(${index})">削除</button>
+      <div class="ing-name">${item.name}</div>
+      <div class="ing-price">${price}円</div>
+      <div class="ing-total">${total}</div>
+      <div class="ing-actions">
+        <button onclick="editIngredient(${index})">編集</button>
+        <button onclick="deleteIngredient(${index})">削除</button>
+      </div>
     `;
 
     listEl.appendChild(div);
@@ -296,15 +305,73 @@ function deleteIngredient(index) {
 }
 
 // 食材を編集
+// function editIngredient(index) {
+//   const data = JSON.parse(localStorage.getItem("ingredients") || "[]");
+//   const item = data[index];
+
+//   const name = prompt("食材名", item.name);
+//   const price = prompt("価格", item.price);
+//   const total = prompt("内容量", item.total);
+
+//   if (!name || !price || !total) return;
+
+//   data[index] = {
+//     name,
+//     price: Number(price),
+//     total: Number(total)
+//   };
+
+//   localStorage.setItem("ingredients", JSON.stringify(data));
+//   renderIngredientList();
+// }
 function editIngredient(index) {
   const data = JSON.parse(localStorage.getItem("ingredients") || "[]");
   const item = data[index];
 
-  const name = prompt("食材名", item.name);
-  const price = prompt("価格", item.price);
-  const total = prompt("内容量", item.total);
+  const listEl = document.getElementById("ingredient-list");
+  const targetRow = listEl.children[index];
 
-  if (!name || !price || !total) return;
+  targetRow.innerHTML = `
+    <input class="ing-name" value="${item.name}">
+    <input class="ing-price" value="${item.price}">
+    <input class="ing-total" value="${item.total}">
+    <div class="ing-actions">
+      <button onclick="saveEdit(${index})">保存</button>
+      <button onclick="renderIngredientList()">キャンセル</button>
+    </div>
+  `;
+
+  const inputs = targetRow.querySelectorAll("input");
+
+  inputs.forEach(input => {
+    // Enterで保存
+    input.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        saveEdit(index);
+      }
+    });
+
+    // フォーマット
+    if (input.classList.contains("ing-price") || input.classList.contains("ing-total")) {
+      input.addEventListener("blur", () => formatInput(input));
+    }
+  });
+}
+
+function saveEdit(index) {
+  const listEl = document.getElementById("ingredient-list");
+  const row = listEl.children[index];
+
+  const name = row.querySelector(".ing-name").value.trim();
+  const price = row.querySelector(".ing-price").value;
+  const total = row.querySelector(".ing-total").value;
+
+  if (!name || !price || !total) {
+    alert("すべて入力してください");
+    return;
+  }
+
+  const data = JSON.parse(localStorage.getItem("ingredients") || "[]");
 
   data[index] = {
     name,

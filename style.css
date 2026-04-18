@@ -194,6 +194,7 @@ button {
   width: 100%;
 }
 
+/* オートコンプリート */
 .suggestions {
   font-size: 13px;
   position: absolute;
@@ -221,4 +222,33 @@ button {
 
 .hidden {
   display: none;
+}
+
+/* 登録食材リスト */
+.ingredient-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+  /* background: rgba(255,0,255,0.5); */
+  max-width: 500px;
+}
+
+.ing-name {
+  width: 30%;
+  text-align: left;
+}
+
+.ing-price {
+  width: 20%;
+  text-align: right;
+}
+
+.ing-total {
+  width: 20%;
+  text-align: right;
+}
+
+.ing-actions {
+  width: 30%;
+  text-align: right;
 }
