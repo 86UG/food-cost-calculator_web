@@ -228,7 +228,7 @@ function setupAutocomplete(row) {
   const list = row.querySelector(".suggestions");
 
   input.addEventListener("input", () => {
-    const value = input.value.trim();
+    const value = toKatakana(input.value.trim());
     const data = JSON.parse(localStorage.getItem("ingredients") || "[]");
 
     list.innerHTML = "";
@@ -239,7 +239,7 @@ function setupAutocomplete(row) {
     }
 
     data
-      .filter(i => i.name.includes(value))
+      .filter(i => toKatakana(i.name).includes(value))
       .forEach(i => {
         const li = document.createElement("li");
         li.textContent = i.name;
@@ -266,6 +266,13 @@ function setupAutocomplete(row) {
   //     list.classList.add("hidden");
   //   }
   // });
+}
+
+// ひらがなをカタカナに変換
+function toKatakana(str) {
+  return str.replace(/[\u3041-\u3096]/g, ch =>
+    String.fromCharCode(ch.charCodeAt(0) + 0x60)
+  );
 }
 
 // 食材一覧表示
@@ -342,6 +349,7 @@ function editIngredient(index) {
   });
 }
 
+// 食材編集を保存
 function saveEdit(index) {
   const listEl = document.getElementById("ingredient-list");
   const row = listEl.children[index];
