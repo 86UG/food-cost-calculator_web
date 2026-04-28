@@ -16,17 +16,22 @@ body{
   /* --danger-hover: #b91c1c; */ 
 
   --surface: #ffffff;
-  --panel: #f7faf7;          /* ほんのり緑の背景 */
-  --border: #ccc; /*#e5e7eb; */
+  --panel: #e6fce6;          /* パネル背景色 */
+  --border: #ccc;       /* 境界線 */
 
   --text: #111827;
   --text-sub: #6b7280;
 
-  --radius: 10px;
-  --shadow: 0 1px 2px rgba(0,0,0,.06);
+  --radius: 10px; /* 角R */
+  --shadow: 1px 1px 2px rgba(0,0,0,0.6); /* 影 */
 
   --control-h: 32px;   /* 入力・ボタンの共通高さ */
   --control-px: 8px;   /* 入力の左右padding */
+
+  --name-width: 24%;  /* 食材名 幅 */
+  --other-width: 17%;  /* 価格、内容量、使用量 幅 */
+
+  --bot-margin: 5px; /* 行間 */
 }
 
 /* デバッグ用背景色 */
@@ -36,6 +41,11 @@ body{
 .debug .result-row .name { background: rgba(255,255,0,0.5); }
 .debug .result-row .value { background: rgba(0,255,255,0.5); }
 .debug .result-row .ratio { background: rgba(255,0,255,0.5); }
+.debug .ingredient-item { background: rgba(0,255,0,0.5); }
+.debug .name { background: rgba(0,0,255,0.5); }
+.debug .price { background: rgba(0,0,255,0.5); }
+.debug .total { background: rgba(0,0,255,0.5); }
+.debug .ing-actions { background: rgba(255,0,255,0.5); }
 
 /*タイトル*/
 #title-area { margin: 10px 0px 20px 0px; }
@@ -52,7 +62,6 @@ body{
 .container {
   width: 100%;
   max-width: 500px;
-  /* margin: auto; */
 }
 
 /* パネル */
@@ -71,6 +80,7 @@ input {
   border: 1px solid #ccc;
   padding: 3px;
   transition: all 0.15s ease;
+  height: var(--control-h);
 }
 
 input:focus {
@@ -98,6 +108,7 @@ input.error:focus {
 }
 
 .servings input {
+  height: auto;
   margin: 2px;
   width: 2em;
 }
@@ -106,50 +117,54 @@ input.error:focus {
 .header {
   font-weight: bold;
   display: flex;
-  align-items: center;
-  margin-bottom: 5px;
+  /* align-items: center; */
+  justify-content: flex-start;
+  gap: 1%;
+  margin-bottom: var(--bot-margin);
 }
 
 .header div {
   box-sizing: border-box;
   background-color: #f5f5f5;
-  border-radius: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 3px;
   text-align: center;
 }
 
-.header div.name {
+/* .header div.name {
   width: 24%;
-  margin: 0% 1% 0% 7%/*xボタン分だけ左に余白*/
-}
+  margin: 0% 1% 0% 7%
+} */
 
 /*食材、価格、内容量、使用量*/
 .row {
   width: 100%;
   display: flex;
-  align-items: center;
-  margin-bottom: 5px;
+  /* align-items: center; */
+  justify-content: flex-start;
+  gap: 1%;
+  margin-bottom: var(--bot-margin);
 }
 
-.row input,
-.row .btn{
+/* .row input {
   height: var(--control-h);
-}
+} */
 
 .row input{
   padding: 0 var(--control-px);
 }
 
 .name {
-  width: 24%;
-  margin: 0% 1% 0% 1%;
+  width: var(--name-width);
+  /* margin: 0 1% 0 0; */
 }
 
 .price,
 .total,
 .used {
-  width: 17%;
-  margin: 0% 1% 0% 1%;
+  width: var(--other-width);
+  /* margin: 0 1% 0 0; */
   text-align: right;
 }
 
@@ -163,9 +178,10 @@ input.error:focus {
   color: var(--text);
   padding: 6px 10px;
   box-shadow: var(--shadow);
+  height: var(--control-h);
 }
 
-/* メイン */
+/* 主操作 */
 .btn-primary{
   background: var(--primary);
   border-color: var(--primary);
@@ -173,26 +189,26 @@ input.error:focus {
 }
 .btn-primary:hover{ background: var(--primary-hover); }
 
-/* サブ */
+/* 副操作 */
 .btn-secondary{ background: #f3f4f6; }
 .btn-secondary:hover{ background: #e5e7eb; }
 
 /* 食材追加 */
 .add-btn {
-  padding: 3px 6px;
+  /* padding: 3px 6px; */
   margin: 0 0 10px 7%;
 }
 
 /* 計算 */
 .calc-btn {
-  padding: 5px 10px;
+  /* padding: 5px 10px; */
   margin: 10px 0px 10px 7%;
 }
 /* .calc-btn:hover { background: #b0d5ff; } */
 
 .row .delete-btn {
   width: auto;
-  margin: 0px 1% 0px 0px;
+  /* margin: 0px 1% 0px 0px; */
   opacity: 1;
 }
 
@@ -201,10 +217,10 @@ input.error:focus {
   opacity: 1;
 }
 
-.row .save-btn {
+/* .row .save-btn {
   width: 10%;
   margin: 0px 0px 0px 1%;
-}
+} */
 
 /* .btn-danger{
   background: #fff;
@@ -271,11 +287,13 @@ input.error:focus {
 
 /* 候補リスト */
 .name-wrapper {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   position: relative;
-  width: 24%;
-  margin: 0% 1% 0% 1%;
+  /* height: var(--control-h); */
+  width: var(--name-width);
+  /* margin: 0 1% 0 0; */
 }
 
 .name-wrapper .name {
@@ -321,23 +339,24 @@ input.error:focus {
 /* 登録食材リスト */
 .ingredient-item {
   display: flex;
-  align-items: center;
-  margin-bottom: 6px;
-  /* background: rgba(255,0,255,0.5); */
-  max-width: 500px;
+  /* align-items: center; */
+  justify-content: flex-start;
+  gap: 1%;
+  margin-bottom: var(--bot-margin);
+  /* max-width: 500px; */
 }
 
 .ingredient-item:hover {
   background: #f7f7f7;
 }
 
-.ingredient-item .btn{
+/* .ingredient-item .btn{
   height: var(--control-h);
-}
+} */
 
-.ing-name {
-  width: 24%;
-  margin: 0 2% 0 7%;
+/* .ing-name {
+  width: var(--name-width);
+  margin: 0 1% 0 0;
   text-align: left;
 }
 
@@ -345,10 +364,19 @@ input.error:focus {
   width: 17%;
   margin: 0 2% 0 0;
   text-align: right;
+} */
+
+.ing-name, .ing-price, .ing-total {
+  font-size: 13px;
+  align-items: center;
+  /* padding: 3px; */
+  height: var(--control-h);
+  /* text-align: center; */
 }
 
 .ing-actions {
-  width: 28%;
+  /*width: auto;/*28%; */
+  flex-grow: 1;
   display: flex;
   justify-content: flex-end;
   align-items: center;

@@ -108,10 +108,6 @@ function createRow() {
   row.className = "row";
 
   row.innerHTML = `
-    <button class="btn btn-icon delete-btn" aria-label="削除" title="削除">
-      ${TRASH_ICON_SVG}
-    </button>
-
     <div class="name-wrapper">
       <input type="text" class="name" placeholder="例：卵" autocomplete="off">
       <ul class="suggestions hidden"></ul>
@@ -119,9 +115,14 @@ function createRow() {
 
     <input type="text" class="price" inputmode="decimal" placeholder="298">
     <input type="text" class="total" inputmode="decimal" placeholder="10">
-    <input type="text" class="used" inputmode="decimal" placeholder="1">
-    
-    <button type="button" class="save-btn">登録</button>
+    <input type="text" class="used" inputmode="decimal" placeholder="1">  
+
+    <div class="ing-actions">
+      <button type="button" class="btn btn-secondary save-btn">登録</button>
+      <button class="btn btn-icon delete-btn" aria-label="削除" title="削除">
+        ${TRASH_ICON_SVG}
+      </button>
+    </div>  
   `;
 
   setupNumberInputs(row);
@@ -320,9 +321,9 @@ function createIngredientRow(item) {
   div.dataset.id = item.id;
 
   div.innerHTML = `
-    <div class="ing-name">${item.name}</div>
-    <div class="ing-price">${Number(item.price).toLocaleString()}円</div>
-    <div class="ing-total">${Number(item.total).toLocaleString()}</div>
+    <div class="ing-name name">${item.name}</div>
+    <div class="ing-price price">${Number(item.price).toLocaleString()}円</div>
+    <div class="ing-total total">${Number(item.total).toLocaleString()}</div>
     <div class="ing-actions">
       <button type="button" class="btn btn-secondary edit-btn">編集</button>
       <button type="button" class="btn btn-icon delete-btn" aria-label="削除" title="削除">
@@ -374,12 +375,12 @@ function createEditRow(item) {
   div.className = "ingredient-item";
 
   div.innerHTML = `
-    <input class="ing-name" value="${item.name}">
-    <input class="ing-price" inputmode="decimal" value="${Number(item.price).toLocaleString()}">
-    <input class="ing-total" inputmode="decimal" value="${Number(item.total).toLocaleString()}">
+    <input class="ing-name name" value="${item.name}">
+    <input class="ing-price price" inputmode="decimal" value="${Number(item.price).toLocaleString()}">
+    <input class="ing-total total" inputmode="decimal" value="${Number(item.total).toLocaleString()}">
     <div class="ing-actions">
-      <button class="save-btn">保存</button>
-      <button class="cancel-btn">キャンセル</button>
+      <button class="btn btn-secondary save-btn">保存</button>
+      <button class="btn btn-secondary cancel-btn">キャンセル</button>
     </div>
   `;
 
