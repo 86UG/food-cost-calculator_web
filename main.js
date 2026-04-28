@@ -2,21 +2,86 @@ document.getElementById("people").addEventListener("blur", function() {
   formatInput(this);
 });
 
+// ==============================
+// 状態管理（グローバル）
+// ==============================
+let editingIngredientId = null;
+
+const IngredientStore = {
+  KEY: "ingredients",
+
+  getAll() {
+    // return JSON.parse(localStorage.getItem(this.KEY)) || [];
+    try {
+      const raw = localStorage.getItem(this.KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  },
+
+  saveAll(data) {
+    localStorage.setItem(this.KEY, JSON.stringify(data));
+  },
+
+  getById(id) {
+    return this.getAll().find(i => i.id === id);
+  },
+
+  upsert(item) {
+    const data = this.getAll();
+    const index = data.findIndex(i => i.id === item.id);
+
+    if (index !== -1) {
+      data[index] = item;
+    } else {
+      data.push(item);
+    }
+
+    this.saveAll(data);
+  },
+
+  deleteById(id) {
+    const data = this.getAll().filter(i => i.id !== id);
+    this.saveAll(data);
+  }
+};
+
+// ゴミ箱アイコンSVG
+const TRASH_ICON_SVG = `
+  <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M9 3h6l1 2h5v2H3V5h5l1-2zm1 7h2v9h-2v-9zm4 0h2v9h-2v-9zM6 8h12l-1 13H7L6 8z"/>
+  </svg>
+`;
+
 // 初期行
 addRow();
 
 // 食材一覧
+migrateIngredients();
 renderIngredientList();
 
-document.addEventListener("click", e => {
-  document.querySelectorAll(".suggestions").forEach(list => {
-    const wrapper = list.closest(".name-wrapper");
+// 食材id生成する
+function generateIngredientId() {
+  return `ing_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+}
 
-    if (!wrapper.contains(e.target)) {
-      list.classList.add("hidden");
+// idが無い場合にidを付与する
+function migrateIngredients() {
+  const data = IngredientStore.getAll();
+
+  let changed = false;
+  data.forEach(item => {
+    if (!item.id) {
+      item.id = generateIngredientId();
+      changed = true;
     }
   });
-});
+
+  if (changed) {
+    IngredientStore.saveAll(data);
+  }
+}
 
 // 全角数字を半角に直す
 function normalizeNumber(value) {
@@ -43,15 +108,20 @@ function createRow() {
   row.className = "row";
 
   row.innerHTML = `
-    <button class="delete-btn">×</button>
+    <button class="btn btn-icon delete-btn" aria-label="削除" title="削除">
+      ${TRASH_ICON_SVG}
+    </button>
+
     <div class="name-wrapper">
-      <input class="name" placeholder="例：卵" autocomplete="off">
+      <input type="text" class="name" placeholder="例：卵" autocomplete="off">
       <ul class="suggestions hidden"></ul>
     </div>
-    <input class="price" inputmode="decimal" placeholder="298">
-    <input class="total" inputmode="decimal" placeholder="10">
-    <input class="used" inputmode="decimal" placeholder="1">
-    <button class="save-btn">登録</button>
+
+    <input type="text" class="price" inputmode="decimal" placeholder="298">
+    <input type="text" class="total" inputmode="decimal" placeholder="10">
+    <input type="text" class="used" inputmode="decimal" placeholder="1">
+    
+    <button type="button" class="save-btn">登録</button>
   `;
 
   setupNumberInputs(row);
@@ -70,31 +140,41 @@ function setupNumberInputs(row) {
 
 function setupSaveButton(row) {
   row.querySelector(".save-btn").addEventListener("click", () => {
-    const name = row.querySelector(".name").value.trim();
-    const price = normalizeNumber(row.querySelector(".price").value);
-    const total = normalizeNumber(row.querySelector(".total").value);
+    const nameEl = row.querySelector(".name");
+    const priceEl = row.querySelector(".price");
+    const totalEl = row.querySelector(".total");
 
-    // 空白の場合に警告
-    if (!name || !price || !total) {
+    const name = nameEl.value.trim();
+
+    // 食材名チェック（空欄はNG）
+    if (!name) {
       alert("食材名・価格・内容量を入力してください");
+      nameEl.classList.add("error");
+      nameEl.focus();
+      return;
+    } else {
+      nameEl.classList.remove("error");
+    }
+
+    // 数値チェック（>0 & 空欄NG）※計算時と同じルールに統一
+    const price = validatePositiveNumber(priceEl);
+    const total = validatePositiveNumber(totalEl);
+
+    if (price === null || total === null) {
+      alert("食材名・価格・内容量を入力してください");
+      (price === null ? priceEl : totalEl).focus();
       return;
     }
 
-    const ingredient = {
+    IngredientStore.upsert({
+      id: generateIngredientId(),
       name,
-      price: Number(price),
-      total: Number(total)
-    };
+      price,
+      total
+    });
 
-    const saved = JSON.parse(localStorage.getItem("ingredients") || "[]");
-    const index = saved.findIndex(i => i.name === name);
-
-    if (index !== -1) saved[index] = ingredient;
-    else saved.push(ingredient);
-
-    localStorage.setItem("ingredients", JSON.stringify(saved));
     alert("登録しました");
-    renderIngredientList()
+    renderIngredientList();
   });
 }
 
@@ -223,49 +303,210 @@ function setupRowEvents(row) {
   });
 }
 
+// 食材一覧表示
+function renderIngredientList() {
+  const listEl = document.getElementById("ingredient-list");
+  listEl.innerHTML = "";
+
+  IngredientStore.getAll().forEach(item => {
+    listEl.appendChild(createIngredientRow(item));
+  });
+}
+
+// 行追加表示
+function createIngredientRow(item) {
+  const div = document.createElement("div");
+  div.className = "ingredient-item";
+  div.dataset.id = item.id;
+
+  div.innerHTML = `
+    <div class="ing-name">${item.name}</div>
+    <div class="ing-price">${Number(item.price).toLocaleString()}円</div>
+    <div class="ing-total">${Number(item.total).toLocaleString()}</div>
+    <div class="ing-actions">
+      <button type="button" class="btn btn-secondary edit-btn">編集</button>
+      <button type="button" class="btn btn-icon delete-btn" aria-label="削除" title="削除">
+        ${TRASH_ICON_SVG}
+      </button>
+    </div>
+  `;
+
+  div.querySelector(".edit-btn")
+    .addEventListener("click", () => editIngredient(item.id));
+
+  div.querySelector(".delete-btn")
+    .addEventListener("click", () => {
+      IngredientStore.deleteById(item.id);
+      renderIngredientList();
+    });
+
+  return div;
+}
+
+// 食材一覧から削除
+// function deleteIngredient(index) {
+//   IngredientStore.deleteByIndex(index);
+//   renderIngredientList();
+// }
+
+// 食材を編集
+function editIngredient(id) {
+  // すでに別の編集中なら、いったん一覧に戻す
+  if (editingIngredientId && editingIngredientId !== id) {
+    renderIngredientList();
+  }
+
+  const item = IngredientStore.getById(id);
+  if (!item) return;
+
+  const listEl = document.getElementById("ingredient-list");
+  const targetRow = listEl.querySelector(`[data-id="${id}"]`);
+
+  const editRow = createEditRow(item);
+  editRow.dataset.id = id;
+
+  targetRow.replaceWith(editRow);
+  editingIngredientId = id;
+}
+
+function createEditRow(item) {
+  const div = document.createElement("div");
+  div.className = "ingredient-item";
+
+  div.innerHTML = `
+    <input class="ing-name" value="${item.name}">
+    <input class="ing-price" inputmode="decimal" value="${Number(item.price).toLocaleString()}">
+    <input class="ing-total" inputmode="decimal" value="${Number(item.total).toLocaleString()}">
+    <div class="ing-actions">
+      <button class="save-btn">保存</button>
+      <button class="cancel-btn">キャンセル</button>
+    </div>
+  `;
+
+  div.querySelector(".save-btn").addEventListener("click", () => saveEdit(item.id));
+
+  div.querySelector(".cancel-btn").addEventListener("click", () => {
+    editingIngredientId = null;
+    renderIngredientList();
+  });
+
+  div.querySelectorAll("input").forEach(input => {
+    input.addEventListener("keydown", e => {
+      if (e.key === "Enter") saveEdit(item.id);
+      if (e.key === "Escape") renderIngredientList();
+    });
+  });
+
+  div.querySelectorAll(".ing-price, .ing-total").forEach(input => input.addEventListener("blur", () => formatInput(input)));
+
+  return div;
+}
+
+// 食材編集を保存
+function saveEdit(id) {
+  const row = document.querySelector(`#ingredient-list [data-id="${id}"]`);
+  if (!row) return;
+
+  const name = row.querySelector(".ing-name").value.trim() || "（名無しの食材）";
+  const price = validatePositiveNumber(row.querySelector(".ing-price"));
+  const total = validatePositiveNumber(row.querySelector(".ing-total"));
+
+  if (price === null || total === null) return;
+
+  IngredientStore.upsert({ id, name, price, total });
+  
+  // 編集中idをリセット
+  editingIngredientId = null;
+  
+  renderIngredientList();
+}
+
+// ==============================
+// Autocomplete（食材名）
+// ==============================
+
+document.addEventListener("click", e => {
+  document.querySelectorAll(".suggestions").forEach(list => {
+    const wrapper = list.closest(".name-wrapper");
+
+    if (!wrapper.contains(e.target)) {
+      list.classList.add("hidden");
+    }
+  });
+});
+
 function setupAutocomplete(row) {
   const input = row.querySelector(".name");
   const list = row.querySelector(".suggestions");
+  let selectedIndex = -1;
+  let currentSuggestions = [];
 
   input.addEventListener("input", () => {
-    const value = toKatakana(input.value.trim());
-    const data = JSON.parse(localStorage.getItem("ingredients") || "[]");
+    currentSuggestions = getIngredientSuggestions(
+      input.value.trim()
+    );
+    selectedIndex = -1;
 
-    list.innerHTML = "";
-
-    if (!value) {
+    if (currentSuggestions.length === 0) {
       list.classList.add("hidden");
       return;
     }
 
-    data
-      .filter(i => toKatakana(i.name).includes(value))
-      .forEach(i => {
-        const li = document.createElement("li");
-        li.textContent = i.name;
-        // li.textContent = `${i.name}（${i.price}円 / ${i.total}）`;
-
-        li.addEventListener("click", () => {
-          input.value = i.name;
-          row.querySelector(".price").value =
-            Number(i.price).toLocaleString();
-          row.querySelector(".total").value =
-            Number(i.total).toLocaleString();
-          list.classList.add("hidden");
-        });
-
-        list.appendChild(li);
-      });
-
-    list.classList.toggle("hidden", list.children.length === 0);
+    renderSuggestions(
+      list,
+      row,
+      currentSuggestions,
+      input,
+      selectedIndex
+    );
   });
 
-  // フォーカス外れたら閉じる（少し遅延）
-  // document.addEventListener("click", e => {
-  //   if (!row.contains(e.target)) {
-  //     list.classList.add("hidden");
-  //   }
-  // });
+  input.addEventListener("keydown", e => {
+    if (list.classList.contains("hidden")) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      selectedIndex =
+        (selectedIndex + 1) % currentSuggestions.length;
+    }
+
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      selectedIndex =
+        (selectedIndex - 1 + currentSuggestions.length) %
+        currentSuggestions.length;
+    }
+
+    if (e.key === "Enter") {
+      if (selectedIndex >= 0) {
+        e.preventDefault();
+        const item = currentSuggestions[selectedIndex];
+        applySuggestion(row, input, item);
+        list.classList.add("hidden");
+        selectedIndex = -1;
+        return;
+      }
+    }
+
+    renderSuggestions(
+      list,
+      row,
+      currentSuggestions,
+      input,
+      selectedIndex
+    );
+  });
+}
+
+function getIngredientSuggestions(inputValue) {
+  const value = toKatakana(inputValue);
+  if (!value) return [];
+
+  const data = IngredientStore.getAll();
+
+  return data.filter(i =>
+    toKatakana(i.name).includes(value)
+  );
 }
 
 // ひらがなをカタカナに変換
@@ -275,105 +516,36 @@ function toKatakana(str) {
   );
 }
 
-// 食材一覧表示
-function renderIngredientList() {
-  const listEl = document.getElementById("ingredient-list");
-  const data = JSON.parse(localStorage.getItem("ingredients") || "[]");
+function renderSuggestions(list, row, items, input, selectedIndex) {
+  list.innerHTML = "";
 
-  listEl.innerHTML = "";
+  items.forEach((item, index) => {
+    const li = document.createElement("li");
+    li.textContent = item.name;
 
-  data.forEach((item, index) => {
-    const div = document.createElement("div");
-    div.className = "ingredient-item";
+    if (index === selectedIndex) {
+      li.classList.add("selected");
+    }
 
-    // カンマ表示
-    const price = Number(item.price).toLocaleString();
-    const total = Number(item.total).toLocaleString();
-
-    div.innerHTML = `
-      <div class="ing-name">${item.name}</div>
-      <div class="ing-price">${price}円</div>
-      <div class="ing-total">${total}</div>
-      <div class="ing-actions">
-        <button onclick="editIngredient(${index})">編集</button>
-        <button onclick="deleteIngredient(${index})">削除</button>
-      </div>
-    `;
-
-    listEl.appendChild(div);
-  });
-}
-
-// 食材一覧から削除
-function deleteIngredient(index) {
-  const data = JSON.parse(localStorage.getItem("ingredients") || "[]");
-
-  data.splice(index, 1);
-
-  localStorage.setItem("ingredients", JSON.stringify(data));
-  renderIngredientList();
-}
-
-// 食材を編集
-function editIngredient(index) {
-  const data = JSON.parse(localStorage.getItem("ingredients") || "[]");
-  const item = data[index];
-
-  const listEl = document.getElementById("ingredient-list");
-  const targetRow = listEl.children[index];
-
-  targetRow.innerHTML = `
-    <input class="ing-name" value="${item.name}">
-    <input class="ing-price" value="${item.price}">
-    <input class="ing-total" value="${item.total}">
-    <div class="ing-actions">
-      <button onclick="saveEdit(${index})">保存</button>
-      <button onclick="renderIngredientList()">キャンセル</button>
-    </div>
-  `;
-
-  const inputs = targetRow.querySelectorAll("input");
-
-  inputs.forEach(input => {
-    // Enterで保存
-    input.addEventListener("keydown", e => {
-      if (e.key === "Enter") {
-        saveEdit(index);
-      }
+    li.addEventListener("click", () => {
+      applySuggestion(row, input, item);
+      list.classList.add("hidden");
     });
 
-    // フォーマット
-    if (input.classList.contains("ing-price") || input.classList.contains("ing-total")) {
-      input.addEventListener("blur", () => formatInput(input));
-    }
+    list.appendChild(li);
   });
+
+  list.classList.remove("hidden");
 }
 
-// 食材編集を保存
-function saveEdit(index) {
-  const listEl = document.getElementById("ingredient-list");
-  const row = listEl.children[index];
-
-  const name = row.querySelector(".ing-name").value.trim() || "（名無しの食材）";
-  const priceEl = row.querySelector(".ing-price");
-  const totalEl = row.querySelector(".ing-total");
-
-  const price = validatePositiveNumber(priceEl);
-  const total = validatePositiveNumber(totalEl);
-
-  if (price === null || total === null) {
-    alert("0より大きい数字を入力してください");
-    return;
-  }
-
-  const data = JSON.parse(localStorage.getItem("ingredients") || "[]");
-
-  data[index] = {
-    name,
-    price: Number(price),
-    total: Number(total)
-  };
-
-  localStorage.setItem("ingredients", JSON.stringify(data));
-  renderIngredientList();
+function applySuggestion(row, input, item) {
+  input.value = item.name;
+  row.querySelector(".price").value =
+    Number(item.price).toLocaleString();
+  row.querySelector(".total").value =
+    Number(item.total).toLocaleString();
 }
+
+// ==============================
+// 
+// ==============================

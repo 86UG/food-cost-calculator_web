@@ -7,6 +7,9 @@
     <meta name="google-site-verification" content="JUQzpSWXDlmY2dKkkwU9a716EybnjabIKuK38MrQCgc" />
     <title>その一皿、いくら？｜食費計算・一人前コスト計算ツール</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="http://fonts.googleapis.com/earlyaccess/notosansjp.css">
   </head>
 
   <!-- デバッグon -->
@@ -23,43 +26,50 @@
 
     <!-- 本文 -->
     <div class="container">
-      <!-- 人前 -->
-      <div class="servings">
-        レシピ：
-        <input type="text" id="people" inputmode="decimal">
-        人前
-      </div>
+      <!-- 入力パネル -->
+      <section class="panel">
+        <!-- 人前 -->
+        <div class="servings">
+          レシピ：
+          <input type="text" id="people" inputmode="decimal">
+          人前
+        </div>
 
-      <!-- ヘッダー -->
-      <div class="header">
-        <div class="name">食材名</div>
-        <div class="price">価格</div>
-        <div class="total">内容量</div>
-        <div class="used">使用量</div>
-      </div>
+        <!-- ヘッダー -->
+        <div class="header">
+          <div class="name">食材名</div>
+          <div class="price">価格</div>
+          <div class="total">内容量</div>
+          <div class="used">使用量</div>
+        </div>
 
-      <!-- 食材リスト -->
-      <div id="ingredient-row"></div>
+        <!-- 食材リスト -->
+        <div id="ingredient-row"></div>
 
-      <!-- 追加ボタン -->
-      <button class="add-btn" onclick="addRow()">＋ 食材を追加する</button>
+        <!-- 追加ボタン -->
+        <button class="btn btn-secondary add-btn" onclick="addRow()">＋ 食材を追加する</button>
 
-      <br>
+        <br>
 
-      <!-- 計算ボタン -->
-      <button class="calc-btn" onclick="calculate()">計算する</button>
-
-      <!-- 結果 -->
-      <div class="result" id="result"></div>
-
-      <h2>登録済み食材</h2>
-      <div class="header">
-        <div class="name">食材名</div>
-        <div class="price">価格</div>
-        <div class="total">内容量</div>
-      </div>
-      <div id="ingredient-list"></div>
-
+        <!-- 計算ボタン -->
+        <button class="btn btn-primary calc-btn" onclick="calculate()">計算する</button>
+      </section>
+        
+      <!-- 結果パネル -->
+      <section class="panel">
+        <div class="result" id="result"></div>
+      </section>
+      
+      <!-- 一覧パネル -->
+      <section class="panel">
+        <h2>登録済み食材</h2>
+        <div class="header">
+          <div class="name">食材名</div>
+          <div class="price">価格</div>
+          <div class="total">内容量</div>
+        </div>
+        <div id="ingredient-list"></div>
+      </section>
     </div>
 
     <script src="main.js" defer></script>
