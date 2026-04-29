@@ -60,6 +60,27 @@ const REGISTER_ICON_SVG = `
   </svg>
 `;
 
+// 編集アイコンSVG
+const EDIT_ICON_SVG = `
+  <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M3 17.25V21h3.75L17.8 9.94l-3.75-3.75L3 17.25zm2.92 2.33H5v-.92l9.06-9.06.92.92L5.92 19.58zM20.71 7.04a1.003 1.003 0 0 0 0-1.42L18.37 3.29a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.83z"/>
+  </svg>
+`;
+
+// 保存アイコンSVG
+const SAVE_ICON_SVG = `
+  <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M17 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14V7l-2-4zM5 5h11.17L17 6.83V19H5V5zm7 0v4H6V5h6z"/>
+  </svg>
+`;
+
+// キャンセルアイコンSVG
+const CANCEL_ICON_SVG = `
+  <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M10 6L4 12l6 6v-4h4a4 4 0 0 0 0-8h-1v2h1a2 2 0 0 1 0 4h-4V6z"/>
+  </svg>
+`;
+
 // 初期行
 addRow();
 
@@ -132,8 +153,6 @@ function createRow() {
       </button>
     </div>  
   `;
-
-        // <button type="button" class="btn-secondary save-btn">登録</button>
 
   setupNumberInputs(row);
   setupSaveButton(row);
@@ -335,8 +354,10 @@ function createIngredientRow(item) {
     <div class="ing-price price">${Number(item.price).toLocaleString()} 円</div>
     <div class="ing-total total">${Number(item.total).toLocaleString()}</div>
     <div class="ing-actions">
-      <button type="button" class="btn-secondary edit-btn">編集</button>
-      <button type="button" class="btn-icon delete-btn" aria-label="削除" title="削除">
+      <button class="btn-icon edit-btn" aria-label="編集" title="編集">
+        ${EDIT_ICON_SVG}
+      </button>
+      <button class="btn-icon delete-btn" aria-label="削除" title="削除">
         ${TRASH_ICON_SVG}
       </button>
     </div>
@@ -389,8 +410,12 @@ function createEditRow(item) {
     <input class="ing-price price" inputmode="decimal" value="${Number(item.price).toLocaleString()}">
     <input class="ing-total total" inputmode="decimal" value="${Number(item.total).toLocaleString()}">
     <div class="ing-actions">
-      <button class="btn-secondary save-btn">保存</button>
-      <button class="btn-secondary cancel-btn">キャンセル</button>
+      <button class="btn-icon save-btn" aria-label="保存" title="保存">
+        ${SAVE_ICON_SVG}
+      </button>
+      <button class="btn-icon cancel-btn" aria-label="キャンセル" title="キャンセル">
+        ${CANCEL_ICON_SVG}
+      </button>
     </div>
   `;
 
