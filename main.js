@@ -11,7 +11,6 @@ const IngredientStore = {
   KEY: "ingredients",
 
   getAll() {
-    // return JSON.parse(localStorage.getItem(this.KEY)) || [];
     try {
       const raw = localStorage.getItem(this.KEY);
       return raw ? JSON.parse(raw) : [];
@@ -51,6 +50,13 @@ const IngredientStore = {
 const TRASH_ICON_SVG = `
   <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
     <path fill="currentColor" d="M9 3h6l1 2h5v2H3V5h5l1-2zm1 7h2v9h-2v-9zm4 0h2v9h-2v-9zM6 8h12l-1 13H7L6 8z"/>
+  </svg>
+`;
+
+// 登録アイコンSVG
+const REGISTER_ICON_SVG = `
+  <svg aria-hidden="true" focusable="false" viewBox="0 0 20 20">
+    <path fill="currentColor" d="M4 4h10v2H4V4zm0 4h10v2H4V8zm0 4h6v2H4v-2zm12-1v-3h2v3h3v2h-3v3h-2v-3h-3v-2h3z"/>
   </svg>
 `;
 
@@ -118,12 +124,16 @@ function createRow() {
     <input type="text" class="used" inputmode="decimal" placeholder="1">  
 
     <div class="ing-actions">
-      <button type="button" class="btn btn-secondary save-btn">登録</button>
-      <button class="btn btn-icon delete-btn" aria-label="削除" title="削除">
+      <button class="btn-icon save-btn" aria-label="登録" title="登録">
+        ${REGISTER_ICON_SVG}
+      </button>
+      <button class="btn-icon delete-btn" aria-label="削除" title="削除">
         ${TRASH_ICON_SVG}
       </button>
     </div>  
   `;
+
+        // <button type="button" class="btn-secondary save-btn">登録</button>
 
   setupNumberInputs(row);
   setupSaveButton(row);
@@ -251,7 +261,7 @@ function calculate() {
     html += `
       <div class="result-row">
         <span class="name">${item.name}</span>
-        <span class="value">${item.cost.toFixed(0)}円</span>
+        <span class="value">${item.cost.toFixed(0)} 円</span>
         <span class="ratio">（${ratio.toFixed(1)}%）</span>
       </div>
     `;
@@ -264,7 +274,7 @@ function calculate() {
   html += `
     <div class="result-row">
       <span class="name">合計：</span>
-      <span class="value">${totalCost.toFixed(0)}円</span>
+      <span class="value">${totalCost.toFixed(0)} 円</span>
       <span class="ratio"></span>
     </div>
   `;
@@ -273,7 +283,7 @@ function calculate() {
   html += `
     <div class="result-row perPerson">
       <span class="name">一人前：</span>
-      <span class="value">${(totalCost / people).toFixed(0)}円</span>
+      <span class="value">${(totalCost / people).toFixed(0)} 円</span>
       <span class="ratio"></span>
     </div>
   `;
@@ -322,11 +332,11 @@ function createIngredientRow(item) {
 
   div.innerHTML = `
     <div class="ing-name name">${item.name}</div>
-    <div class="ing-price price">${Number(item.price).toLocaleString()}円</div>
+    <div class="ing-price price">${Number(item.price).toLocaleString()} 円</div>
     <div class="ing-total total">${Number(item.total).toLocaleString()}</div>
     <div class="ing-actions">
-      <button type="button" class="btn btn-secondary edit-btn">編集</button>
-      <button type="button" class="btn btn-icon delete-btn" aria-label="削除" title="削除">
+      <button type="button" class="btn-secondary edit-btn">編集</button>
+      <button type="button" class="btn-icon delete-btn" aria-label="削除" title="削除">
         ${TRASH_ICON_SVG}
       </button>
     </div>
@@ -379,8 +389,8 @@ function createEditRow(item) {
     <input class="ing-price price" inputmode="decimal" value="${Number(item.price).toLocaleString()}">
     <input class="ing-total total" inputmode="decimal" value="${Number(item.total).toLocaleString()}">
     <div class="ing-actions">
-      <button class="btn btn-secondary save-btn">保存</button>
-      <button class="btn btn-secondary cancel-btn">キャンセル</button>
+      <button class="btn-secondary save-btn">保存</button>
+      <button class="btn-secondary cancel-btn">キャンセル</button>
     </div>
   `;
 
