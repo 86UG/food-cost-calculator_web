@@ -6,6 +6,7 @@ body{
     "Hiragino Kaku Gothic ProN", Meiryo,
     "Helvetica Neue", Arial, sans-serif;
   color: var(--text);
+  background: #f9fafb;
 }
 
 /* 色、線など設定 */
@@ -15,14 +16,16 @@ body{
   --secondary-color: #f3f4f6;     /* 副操作ボタン・ヘッダー背景色 */
   --secondary-hover-color: #e5e7eb;
   --alert-color: #ffe6e6;         /* 警告色：削除ボタン、エラー箇所 */
-  --panel: #e6fce6;               /* パネル背景色 */
+  --panel: #ffffff;/*#e6fce6;               /* パネル背景色 */
   --border: #ccc;                 /* 境界線 */
+
+  --row-hover-color: #f3f4f6;
 
   --text: #111827;
   --text-sub: #6b7280;
 
   --radius: 10px; /* 角R：ボタン、パネル、ヘッダー */
-  --shadow: 1px 1px 2px rgba(0,0,0,0.6); /* 影 */
+  --shadow:  0 2px 6px rgba(0,0,0,0.08);/*1px 1px 2px rgba(0,0,0,0.6); /* 影 */
 
   --control-h: 32px;   /* 入力・ボタンの共通高さ */
   --control-px: 8px;   /* 入力の左右padding */
@@ -57,6 +60,8 @@ body{
   margin: 0px 0px 0px 0px;
 }
 
+.panel h2{ margin: 0 0 12px 0; }
+
 /*本文全体*/
 .container {
   width: 100%;
@@ -66,7 +71,7 @@ body{
 /* パネル */
 .panel{
   background: var(--panel);
-  border: 1px solid var(--border);
+  border: 1px solid #e5e7eb;/*var(--border);*/
   border-radius: var(--radius);
   padding: 12px;
   margin: 12px 0;
@@ -100,7 +105,7 @@ input.error:focus {
 /* 〇人前 */
 .servings {
   display: flex;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 }
 
 .servings input {
@@ -111,7 +116,9 @@ input.error:focus {
 
 /* ヘッダー */
 .header {
-  font-weight: bold;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-sub);
   display: flex;
   /* align-items: center; */
   justify-content: flex-start;
@@ -121,10 +128,10 @@ input.error:focus {
 
 .header div {
   box-sizing: border-box;
-  background-color: var(--secondary-color);
+  background-color: transparent;/* var(--secondary-color);*/
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 3px;
+  padding: 4px 0;
   text-align: center;
 }
 
@@ -136,6 +143,11 @@ input.error:focus {
   justify-content: flex-start;
   gap: 1%;
   margin-bottom: var(--bot-margin);
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.row:hover {
+  background: var(--row-hover-color);
 }
 
 .row input, .ingredient-item input {
@@ -176,9 +188,15 @@ button {
 .btn-secondary{ background: var(--secondary-color); }
 .btn-secondary:hover{ background: var(--secondary-hover-color); }
 
+/* 食材追加 */
+/* .add-btn {
+  font-size: 14px;
+  padding: 6px 10px;
+} */
+
 /* 計算 */
 .calc-btn {
-  margin: 10px auto;
+  margin: 12px 0 0 0;
 }
 
 /* 削除ボタン選択時 */
@@ -203,7 +221,10 @@ button {
 
 /*計算結果*/
 #result {
-  margin: 0px 0px 0px 6%;
+  padding: 20px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
+  /* margin: 0px 0px 0px 6%; */
   min-height: 24px;
 }
 
@@ -227,12 +248,13 @@ button {
 #result .ratio {
   display: inline-block;
   text-align: right;
-  width: 20%;
+  flex-grow: 1;
 }
 
 #result .perPerson {
-  font-size: 18px;
+  font-size: 24px;
   font-weight: bold;
+  color: var(--primary-color);
 }
 
 /* 候補リスト */
@@ -292,18 +314,20 @@ button {
   gap: 1%;
   margin-bottom: var(--bot-margin);
   /* max-width: 500px; */
+  transition: background 0.15s ease;
 }
 
 .ingredient-item:hover {
-  background: #f7f7f7;
+  background: var(--row-hover-color);
 }
 
 .ing-name, .ing-price, .ing-total {
   font-size: 13px;
   align-items: center;
-  /* padding: 3px; */
+  /* padding: 0 8px; */
   height: var(--control-h);
   /* text-align: center; */
+  /* background: rgba(255,0,255,0.5);  */
 }
 
 .actions {
