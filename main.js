@@ -71,6 +71,7 @@ const EDIT_ICON_SVG = `
 const SAVE_ICON_SVG = `
   <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
     <path fill="currentColor" d="M17 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14V7l-2-4zM5 5h11.17L17 6.83V19H5V5zm7 0v4H6V5h6z"/>
+    <circle cx="12" cy="14" r="2" fill="currentColor"/>
   </svg>
 `;
 
@@ -280,7 +281,7 @@ function calculate() {
     html += `
       <div class="result-row">
         <span class="name">${item.name}</span>
-        <span class="value">${item.cost.toFixed(0)} 円</span>
+        <span class="value">${Number(item.cost.toFixed(0)).toLocaleString()} 円</span>
         <span class="ratio">（${ratio.toFixed(1)}%）</span>
       </div>
     `;
@@ -293,7 +294,7 @@ function calculate() {
   html += `
     <div class="result-row">
       <span class="name">合計：</span>
-      <span class="value">${totalCost.toFixed(0)} 円</span>
+      <span class="value">${Number(totalCost.toFixed(0)).toLocaleString()} 円</span>
       <span class="ratio"></span>
     </div>
   `;
@@ -302,7 +303,7 @@ function calculate() {
   html += `
     <div class="result-row perPerson">
       <span class="name">一人前：</span>
-      <span class="value">${(totalCost / people).toFixed(0)} 円</span>
+      <span class="value">${Number((totalCost / people).toFixed(0)).toLocaleString()} 円</span>
       <span class="ratio"></span>
     </div>
   `;
