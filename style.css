@@ -27,7 +27,7 @@ body{
   --control-h: 32px;   /* 入力・ボタンの共通高さ */
   --control-px: 8px;   /* 入力の左右padding */
 
-  --name-width: 24%;  /* 食材名 幅：ヘッダー、入力、リスト */
+  --name-width: 23%;  /* 食材名 幅：ヘッダー、入力、リスト */
   --other-width: 17%;  /* 価格、内容量、使用量 幅 */
 
   --bot-margin: 5px; /* 行間 */
@@ -44,7 +44,7 @@ body{
 .debug .name { background: rgba(0,0,255,0.5); }
 .debug .price { background: rgba(0,0,255,0.5); }
 .debug .total { background: rgba(0,0,255,0.5); }
-.debug .ing-actions { background: rgba(255,0,255,0.5); }
+.debug .actions { background: rgba(255,0,255,0.5); }
 
 /*タイトル*/
 #title-area { margin: 10px 0px 20px 0px; }
@@ -306,11 +306,11 @@ button {
   /* text-align: center; */
 }
 
-.ing-actions {
+.actions {
   /*width: auto;/*28%; */
   flex-grow: 1;
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }

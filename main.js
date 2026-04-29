@@ -144,7 +144,7 @@ function createRow() {
     <input type="text" class="total" inputmode="decimal" placeholder="10">
     <input type="text" class="used" inputmode="decimal" placeholder="1">  
 
-    <div class="ing-actions">
+    <div class="actions">
       <button class="btn-icon save-btn" aria-label="登録" title="登録">
         ${REGISTER_ICON_SVG}
       </button>
@@ -353,7 +353,7 @@ function createIngredientRow(item) {
     <div class="ing-name name">${item.name}</div>
     <div class="ing-price price">${Number(item.price).toLocaleString()} 円</div>
     <div class="ing-total total">${Number(item.total).toLocaleString()}</div>
-    <div class="ing-actions">
+    <div class="actions">
       <button class="btn-icon edit-btn" aria-label="編集" title="編集">
         ${EDIT_ICON_SVG}
       </button>
@@ -409,7 +409,7 @@ function createEditRow(item) {
     <input class="ing-name name" value="${item.name}">
     <input class="ing-price price" inputmode="decimal" value="${Number(item.price).toLocaleString()}">
     <input class="ing-total total" inputmode="decimal" value="${Number(item.total).toLocaleString()}">
-    <div class="ing-actions">
+    <div class="actions">
       <button class="btn-icon save-btn" aria-label="保存" title="保存">
         ${SAVE_ICON_SVG}
       </button>
