@@ -497,7 +497,7 @@ function setupAutocomplete(row) {
       selectedIndex
     );
   });
-
+  
   input.addEventListener("keydown", e => {
     if (list.classList.contains("hidden")) return;
 
@@ -521,6 +521,7 @@ function setupAutocomplete(row) {
         applySuggestion(row, input, item);
         list.classList.add("hidden");
         selectedIndex = -1;
+        focusUsedInput(input);
         return;
       }
     }
@@ -581,6 +582,18 @@ function applySuggestion(row, input, item) {
     Number(item.price).toLocaleString();
   row.querySelector(".total").value =
     Number(item.total).toLocaleString();
+}
+
+// オートコンプリート確定後に使用量へフォーカスする
+function focusUsedInput(currentInput) {
+  const row = currentInput.closest('.row');
+  if (!row) return;
+
+  const usedInput = row.querySelector('.used');
+  if (usedInput) {
+    usedInput.focus();
+    usedInput.select(); // 数値入力しやすくする（任意だけどおすすめ）
+  }
 }
 
 // ==============================
