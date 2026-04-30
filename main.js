@@ -142,7 +142,14 @@ function createRow() {
     </div>
 
     <input type="text" class="price" inputmode="decimal" placeholder="298">
+    
     <input type="text" class="total" inputmode="decimal" placeholder="10">
+    <!-- <select class="units">
+      <option value="unit">個</option>
+      <option value="g">g</option>
+      <option value="ml">ml</option>
+    </select> -->
+    
     <input type="text" class="used" inputmode="decimal" placeholder="1">  
 
     <div class="actions">
@@ -521,7 +528,6 @@ function setupAutocomplete(row) {
         applySuggestion(row, input, item);
         list.classList.add("hidden");
         selectedIndex = -1;
-        focusUsedInput(input);
         return;
       }
     }
@@ -582,6 +588,8 @@ function applySuggestion(row, input, item) {
     Number(item.price).toLocaleString();
   row.querySelector(".total").value =
     Number(item.total).toLocaleString();
+  
+  focusUsedInput(input);
 }
 
 // オートコンプリート確定後に使用量へフォーカスする
