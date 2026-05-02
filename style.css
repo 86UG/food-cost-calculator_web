@@ -457,187 +457,11 @@ button {
 }
 
 /* ==============================
-   食材カード＋2行レイアウト
+   登録済み食材リスト 列幅（ヘッダー・行共通）
    ============================== */
-
-/* カード化 */
-.row {
-  display: block !important;
-  background: var(--secondary-color);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 8px 10px;
-  margin-bottom: 8px;
-  transition: background 0.15s ease;
-}
-
-.row:hover { background: #e8e9eb; }
-
-/* 1行目：食材名 ＋ [内容量|単位▼] ＋ 価格 */
-.row-line1 {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-bottom: 6px;
-}
-
-.row-line1 .name-wrapper {
-  flex: 1.5;
-  min-width: 0;
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: auto;
-}
-
-.row-line1 .name-wrapper .name {
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* 内容量＋単位（一体化） */
-.total-wrapper {
-  display: flex;
-  align-items: stretch;
-  flex: 1.2;
-  min-width: 0;
-  height: var(--control-h);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  overflow: hidden;
-  box-sizing: border-box;
-}
-
-.total-wrapper .total {
-  flex: 1;
-  min-width: 0;
-  border: none !important;
-  box-shadow: none !important;
-  height: 100%;
-  padding: 0 4px;
-  text-align: right;
-  transition: background 0.15s ease;
-}
-
-.total-wrapper .total:focus {
-  outline: none;
-  background-color: #f0f8ff;
-}
-
-.total-wrapper .unit {
-  flex-shrink: 0;
-  width: 36px;
-  height: 100%;
-  border: none;
-  border-left: 1px solid var(--border);
-  background: #e9eaec;
-  font-size: 12px;
-  text-align: center;
-  cursor: pointer;
-  box-sizing: border-box;
-  appearance: none;
-  -webkit-appearance: none;
-  padding: 0;
-}
-
-/* 価格 */
-.row-line1 .price {
-  flex: 0.9;
-  min-width: 0;
-  text-align: right;
-}
-
-/* 2行目：使用量 ＋ 単位ラベル ＋ ボタン */
-.row-line2 {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.used-label {
-  font-size: 11px;
-  color: var(--text-sub);
-  white-space: nowrap;
-}
-
-.row-line2 .used {
-  width: 70px;
-  text-align: right;
-}
-
-.unit-label {
-  font-size: 12px;
-  color: var(--text-sub);
-  white-space: nowrap;
-  flex: 1;
-}
-
-/* ==============================
-   計算結果（列揃え）
-   ============================== */
-.result-row {
-  display: flex;
-}
-
-.result-name {
-  flex: 0 0 46%;
-  text-align: right;
-}
-
-.result-value {
-  flex: 0 0 30%;
-  text-align: right;
-}
-
-.result-ratio {
-  flex: 1;
-  text-align: right;
-}
-
-.result-row.perPerson .result-name,
-.result-row.perPerson .result-value {
-  font-size: 24px;
-  font-weight: bold;
-  color: var(--primary-color);
-}
-
-/* ==============================
-   登録済み食材リスト（列幅揃え）
-   ============================== */
-
-/* ヘッダー・行で共通の列幅 */
-.col-name  { flex: 0 0 36%; }
-.col-price { flex: 0 0 24%; text-align: right; }
-.col-total { flex: 0 0 22%; text-align: right; }
-
-/* ヘッダー */
-.header {
-  display: flex;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-sub);
-  margin-bottom: var(--bot-margin);
-}
-
-.header div {
-  box-sizing: border-box;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 4px 0;
-  text-align: center;
-}
-
-/* 各行 */
-.ingredient-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-bottom: var(--bot-margin);
-  transition: background 0.15s ease;
-}
-
-.ingredient-item:hover { background: var(--row-hover-color); }
+.col-name  { flex: 0 0 30%; }
+.col-price { flex: 0 0 22%; justify-content: flex-end; }
+.col-total { flex: 0 0 22%; justify-content: flex-end; }
 
 .ingredient-item .col-name,
 .ingredient-item .col-price,
@@ -650,9 +474,9 @@ button {
   white-space: nowrap;
 }
 
-/* 編集時：内容量＋単位を一体化 */
+/* 編集時：内容量＋単位を col-total と同じ幅で一体化 */
 .col-total-wrapper {
-  flex: 0 0 22%;
+  flex: 0 0 22%;          /* col-total と同じ幅 */
   display: flex;
   align-items: stretch;
   height: var(--control-h);
@@ -693,6 +517,6 @@ button {
   padding: 0;
 }
 
-/* 編集時のinput（名前・価格） */
-.ingredient-item input.col-name  { padding: 0 var(--control-px); }
-.ingredient-item input.col-price { padding: 0 var(--control-px); text-align: right; }
+/* 編集時 input */
+.ingredient-item input.col-name  { flex: 0 0 30%; padding: 0 var(--control-px); min-width: 0;}
+.ingredient-item input.col-price { flex: 0 0 22%; padding: 0 var(--control-px); min-width: 0; text-align: right; }

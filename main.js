@@ -300,9 +300,9 @@ function calculate() {
     const ratio = (item.cost / totalCost) * 100;
     html += `
       <div class="result-row">
-        <span class="result-name">${item.name}</span>
-        <span class="result-value">${Number(item.cost.toFixed(0)).toLocaleString()} 円</span>
-        <span class="result-ratio">（${ratio.toFixed(1)}%）</span>
+        <span class="name">${item.name}</span>
+        <span class="value">${Number(item.cost.toFixed(0)).toLocaleString()} 円</span>
+        <span class="ratio">（${ratio.toFixed(1)}%）</span>
       </div>
     `;
   });
@@ -313,18 +313,18 @@ function calculate() {
   // 合計
   html += `
     <div class="result-row">
-      <span class="result-name">合計：</span>
-      <span class="result-value">${Number(totalCost.toFixed(0)).toLocaleString()} 円</span>
-      <span class="result-ratio"></span>
+      <span class="name">合計：</span>
+      <span class="value">${Number(totalCost.toFixed(0)).toLocaleString()} 円</span>
+      <span class="ratio"></span>
     </div>
   `;
 
   // 一人前
   html += `
     <div class="result-row perPerson">
-      <span class="result-name">一人前：</span>
-      <span class="result-value">${Number((totalCost / people).toFixed(0)).toLocaleString()} 円</span>
-      <span class="result-ratio"></span>
+      <span class="name">一人前：</span>
+      <span class="value">${Number((totalCost / people).toFixed(0)).toLocaleString()} 円</span>
+      <span class="ratio"></span>
     </div>
   `;
 
@@ -433,9 +433,9 @@ function createEditRow(item) {
     <div class="col-total-wrapper">
       <input class="col-total" inputmode="decimal" value="${Number(item.total).toLocaleString()}">
       <select class="col-unit">
-        <option value="g"  ${unitVal==="g"  ?"selected":""}>g</option>
-        <option value="mL" ${unitVal==="mL" ?"selected":""}>mL</option>
-        <option value="個" ${unitVal==="個" ?"selected":""}>個</option>
+        <option value="g"  ${unitVal === "g"  ? "selected" : ""}>g</option>
+        <option value="mL" ${unitVal === "mL" ? "selected" : ""}>mL</option>
+        <option value="個" ${unitVal === "個" ? "selected" : ""}>個</option>
       </select>
     </div>
     <div class="actions">
@@ -462,7 +462,9 @@ function createEditRow(item) {
     });
   });
 
-  div.querySelectorAll(".col-price, .col-total").forEach(input => input.addEventListener("blur", () => formatInput(input)));
+  div.querySelectorAll(".col-price, .col-total").forEach(input =>
+    input.addEventListener("blur", () => formatInput(input))
+  );
 
   return div;
 }
@@ -472,14 +474,14 @@ function saveEdit(id) {
   const row = document.querySelector(`#ingredient-list [data-id="${id}"]`);
   if (!row) return;
 
-  const name  = row.querySelector(".col-name").value.trim() || "（名無しの食材）";
+  const name = row.querySelector(".col-name").value.trim() || "（名無しの食材）";
   const price = validatePositiveNumber(row.querySelector(".col-price"));
   const total = validatePositiveNumber(row.querySelector(".col-total"));
-  const unitEl = row.querySelector(".col-unit");
-  const unit  = unitEl ? unitEl.value : "g";
 
   if (price === null || total === null) return;
 
+  const unitEl = row.querySelector(".col-unit");
+  const unit = unitEl ? unitEl.value : (row.querySelector(".col-total")?.dataset.unit ?? "g");
   IngredientStore.upsert({ id, name, price, total, unit });
   
   // 編集中idをリセット
