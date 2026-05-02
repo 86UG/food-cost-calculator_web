@@ -136,30 +136,36 @@ function createRow() {
   row.className = "row";
 
   row.innerHTML = `
-    <div class="name-wrapper">
-      <input type="text" class="name" placeholder="例：卵" autocomplete="off">
-      <ul class="suggestions hidden"></ul>
+    <div class="row-line1">
+      <div class="name-wrapper">
+        <input type="text" class="name" placeholder="食材名（例：卵）" autocomplete="off">
+        <ul class="suggestions hidden"></ul>
+      </div>
+      <div class="total-wrapper">
+        <input type="text" class="total" inputmode="decimal" placeholder="内容量">
+        <select class="unit">
+          <option value="g">g</option>
+          <option value="mL">mL</option>
+          <option value="個">個</option>
+        </select>
+      </div>
+      <input type="text" class="price" inputmode="decimal" placeholder="価格">
     </div>
 
-    <input type="text" class="price" inputmode="decimal" placeholder="298">
-    
-    <input type="text" class="total" inputmode="decimal" placeholder="10">
-    <!-- <select class="units">
-      <option value="unit">個</option>
-      <option value="g">g</option>
-      <option value="ml">ml</option>
-    </select> -->
-    
-    <input type="text" class="used" inputmode="decimal" placeholder="1">  
+    <div class="row-line2">
+      <span class="used-label">使用量</span>
+      <input type="text" class="used" inputmode="decimal" placeholder="0">
+      <span class="unit-label">g</span>
 
-    <div class="actions">
-      <button class="btn-icon save-btn" aria-label="登録" title="登録">
-        ${REGISTER_ICON_SVG}
-      </button>
-      <button class="btn-icon delete-btn" aria-label="削除" title="削除">
-        ${TRASH_ICON_SVG}
-      </button>
-    </div>  
+      <div class="actions">
+        <button class="btn-icon save-btn" aria-label="登録" title="登録">
+          ${REGISTER_ICON_SVG}
+        </button>
+        <button class="btn-icon delete-btn" aria-label="削除" title="削除">
+          ${TRASH_ICON_SVG}
+        </button>
+      </div>
+    </div>
   `;
 
   setupNumberInputs(row);
@@ -170,6 +176,13 @@ function createRow() {
 }
 
 function setupNumberInputs(row) {
+  // 単位プルダウン → 使用量の単位テキストに連動
+  const unitSelect = row.querySelector(".unit");
+  const unitLabel  = row.querySelector(".unit-label");
+  unitSelect.addEventListener("change", () => {
+    unitLabel.textContent = unitSelect.value;
+  });
+
   row.querySelectorAll(".price, .total, .used")
     .forEach(input => {
       input.addEventListener("blur", () => formatInput(input));
@@ -181,6 +194,7 @@ function setupSaveButton(row) {
     const nameEl = row.querySelector(".name");
     const priceEl = row.querySelector(".price");
     const totalEl = row.querySelector(".total");
+    const unit = row.querySelector(".unit").value;
 
     const name = nameEl.value.trim();
 
@@ -204,14 +218,13 @@ function setupSaveButton(row) {
       return;
     }
 
-    IngredientStore.upsert({
-      id: generateIngredientId(),
-      name,
-      price,
-      total
-    });
+    // 同名食材が既にあればそのIDを使って上書き、なければ新規ID
+    const existing = IngredientStore.getAll().find(i => i.name === name);
+    const id = existing ? existing.id : generateIngredientId();
 
-    alert("登録しました");
+    IngredientStore.upsert({ id, name, price, total, unit });
+
+    alert(existing ? `「${name}」を上書きしました` : "登録しました");
     renderIngredientList();
   });
 }
@@ -287,9 +300,9 @@ function calculate() {
     const ratio = (item.cost / totalCost) * 100;
     html += `
       <div class="result-row">
-        <span class="name">${item.name}</span>
-        <span class="value">${Number(item.cost.toFixed(0)).toLocaleString()} 円</span>
-        <span class="ratio">（${ratio.toFixed(1)}%）</span>
+        <span class="result-name">${item.name}</span>
+        <span class="result-value">${Number(item.cost.toFixed(0)).toLocaleString()} 円</span>
+        <span class="result-ratio">（${ratio.toFixed(1)}%）</span>
       </div>
     `;
   });
@@ -300,18 +313,18 @@ function calculate() {
   // 合計
   html += `
     <div class="result-row">
-      <span class="name">合計：</span>
-      <span class="value">${Number(totalCost.toFixed(0)).toLocaleString()} 円</span>
-      <span class="ratio"></span>
+      <span class="result-name">合計：</span>
+      <span class="result-value">${Number(totalCost.toFixed(0)).toLocaleString()} 円</span>
+      <span class="result-ratio"></span>
     </div>
   `;
 
   // 一人前
   html += `
     <div class="result-row perPerson">
-      <span class="name">一人前：</span>
-      <span class="value">${Number((totalCost / people).toFixed(0)).toLocaleString()} 円</span>
-      <span class="ratio"></span>
+      <span class="result-name">一人前：</span>
+      <span class="result-value">${Number((totalCost / people).toFixed(0)).toLocaleString()} 円</span>
+      <span class="result-ratio"></span>
     </div>
   `;
 
@@ -358,9 +371,9 @@ function createIngredientRow(item) {
   div.dataset.id = item.id;
 
   div.innerHTML = `
-    <div class="ing-name name">${item.name}</div>
-    <div class="ing-price price">${Number(item.price).toLocaleString()} 円</div>
-    <div class="ing-total total">${Number(item.total).toLocaleString()}</div>
+    <div class="col-name">${item.name}</div>
+    <div class="col-price">${Number(item.price).toLocaleString()} 円</div>
+    <div class="col-total">${Number(item.total).toLocaleString()} ${item.unit ?? ""}</div>
     <div class="actions">
       <button class="btn-icon edit-btn" aria-label="編集" title="編集">
         ${EDIT_ICON_SVG}
@@ -413,10 +426,18 @@ function createEditRow(item) {
   const div = document.createElement("div");
   div.className = "ingredient-item";
 
+  const unitVal = item.unit ?? "g";
   div.innerHTML = `
-    <input class="ing-name name" value="${item.name}">
-    <input class="ing-price price" inputmode="decimal" value="${Number(item.price).toLocaleString()}">
-    <input class="ing-total total" inputmode="decimal" value="${Number(item.total).toLocaleString()}">
+    <input class="col-name" value="${item.name}">
+    <input class="col-price" inputmode="decimal" value="${Number(item.price).toLocaleString()}">
+    <div class="col-total-wrapper">
+      <input class="col-total" inputmode="decimal" value="${Number(item.total).toLocaleString()}">
+      <select class="col-unit">
+        <option value="g"  ${unitVal==="g"  ?"selected":""}>g</option>
+        <option value="mL" ${unitVal==="mL" ?"selected":""}>mL</option>
+        <option value="個" ${unitVal==="個" ?"selected":""}>個</option>
+      </select>
+    </div>
     <div class="actions">
       <button class="btn-icon save-btn" aria-label="保存" title="保存">
         ${SAVE_ICON_SVG}
@@ -441,7 +462,7 @@ function createEditRow(item) {
     });
   });
 
-  div.querySelectorAll(".ing-price, .ing-total").forEach(input => input.addEventListener("blur", () => formatInput(input)));
+  div.querySelectorAll(".col-price, .col-total").forEach(input => input.addEventListener("blur", () => formatInput(input)));
 
   return div;
 }
@@ -451,13 +472,15 @@ function saveEdit(id) {
   const row = document.querySelector(`#ingredient-list [data-id="${id}"]`);
   if (!row) return;
 
-  const name = row.querySelector(".ing-name").value.trim() || "（名無しの食材）";
-  const price = validatePositiveNumber(row.querySelector(".ing-price"));
-  const total = validatePositiveNumber(row.querySelector(".ing-total"));
+  const name  = row.querySelector(".col-name").value.trim() || "（名無しの食材）";
+  const price = validatePositiveNumber(row.querySelector(".col-price"));
+  const total = validatePositiveNumber(row.querySelector(".col-total"));
+  const unitEl = row.querySelector(".col-unit");
+  const unit  = unitEl ? unitEl.value : "g";
 
   if (price === null || total === null) return;
 
-  IngredientStore.upsert({ id, name, price, total });
+  IngredientStore.upsert({ id, name, price, total, unit });
   
   // 編集中idをリセット
   editingIngredientId = null;
@@ -588,7 +611,14 @@ function applySuggestion(row, input, item) {
     Number(item.price).toLocaleString();
   row.querySelector(".total").value =
     Number(item.total).toLocaleString();
-  
+
+  // 単位を復元して使用量ラベルも連動
+  if (item.unit) {
+    const unitSelect = row.querySelector(".unit");
+    unitSelect.value = item.unit;
+    row.querySelector(".unit-label").textContent = item.unit;
+  }
+
   focusUsedInput(input);
 }
 
