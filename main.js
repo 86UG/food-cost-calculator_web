@@ -234,6 +234,8 @@ function addRow() {
   const newRow = createRow();
 
   list.appendChild(newRow);
+
+  newRow.querySelector(".name").focus()
 }
 
 function calculate() {
@@ -282,6 +284,9 @@ function calculate() {
 
   // エラー時
   if (hasError) {
+    const panel = document.getElementById("result-panel");
+    panel.classList.remove("hidden");
+    
     document.getElementById("result").innerText =
       "0より大きい数字を入力してください";
 
@@ -329,6 +334,7 @@ function calculate() {
   `;
 
   resultEl.innerHTML = html;
+  document.getElementById("result-panel").classList.remove("hidden");
 }
 
 function formatInput(el) {
@@ -480,8 +486,7 @@ function saveEdit(id) {
 
   if (price === null || total === null) return;
 
-  const unitEl = row.querySelector(".col-unit");
-  const unit = unitEl ? unitEl.value : (row.querySelector(".col-total")?.dataset.unit ?? "g");
+  const unit = row.querySelector(".col-unit").value;
   IngredientStore.upsert({ id, name, price, total, unit });
   
   // 編集中idをリセット
@@ -632,7 +637,7 @@ function focusUsedInput(currentInput) {
   const usedInput = row.querySelector('.used');
   if (usedInput) {
     usedInput.focus();
-    usedInput.select(); // 数値入力しやすくする（任意だけどおすすめ）
+    usedInput.select();
   }
 }
 
