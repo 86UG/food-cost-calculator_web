@@ -644,3 +644,236 @@ function focusUsedInput(currentInput) {
 // ==============================
 // 
 // ==============================
+// ==============================
+// RecipeStore
+// ==============================
+
+const RecipeStore = (() => {
+  const KEY = "recipes";
+
+  function getAll() {
+    try { return JSON.parse(localStorage.getItem(KEY)) || []; }
+    catch { return []; }
+  }
+
+  function saveAll(recipes) {
+    localStorage.setItem(KEY, JSON.stringify(recipes));
+  }
+
+  function upsert(recipe) {
+    const recipes = getAll();
+    const idx = recipes.findIndex(r => r.id === recipe.id);
+    if (idx >= 0) recipes[idx] = recipe;
+    else recipes.push(recipe);
+    saveAll(recipes);
+  }
+
+  function deleteById(id) {
+    saveAll(getAll().filter(r => r.id !== id));
+  }
+
+  return { getAll, upsert, deleteById };
+})();
+
+// ==============================
+// レシピ保存モーダル
+// ==============================
+
+function openRecipeModal() {
+  const input = document.getElementById("recipe-name-input");
+  input.value = "";
+  document.getElementById("recipe-modal").classList.remove("hidden");
+  input.focus();
+}
+
+function closeRecipeModal() {
+  document.getElementById("recipe-modal").classList.add("hidden");
+}
+
+// Enterキーでも保存できるように
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("recipe-name-input")
+    .addEventListener("keydown", e => {
+      if (e.key === "Enter") confirmSaveRecipe();
+      if (e.key === "Escape") closeRecipeModal();
+    });
+  renderRecipeList();
+});
+
+function confirmSaveRecipe() {
+  const name = document.getElementById("recipe-name-input").value.trim();
+  if (!name) {
+    document.getElementById("recipe-name-input").classList.add("error");
+    return;
+  }
+
+  const existing = RecipeStore.getAll().find(r => r.name === name);
+  if (existing) {
+    // 同名レシピあり → 上書き確認モーダルへ
+    closeRecipeModal();
+    openOverwriteModal(name, existing.id);
+  } else {
+    closeRecipeModal();
+    saveRecipe(name, null);
+  }
+}
+
+function openOverwriteModal(name, existingId) {
+  document.getElementById("overwrite-recipe-name").textContent = name;
+  document.getElementById("overwrite-modal").classList.remove("hidden");
+  // ボタンにIDを持たせる
+  document.getElementById("btn-overwrite").onclick  = () => { closeOverwriteModal(); saveRecipe(name, existingId); };
+  document.getElementById("btn-new-save").onclick   = () => { closeOverwriteModal(); saveRecipe(name, null); };
+  document.getElementById("btn-cancel-overwrite").onclick = () => closeOverwriteModal();
+}
+
+function closeOverwriteModal() {
+  document.getElementById("overwrite-modal").classList.add("hidden");
+}
+
+// ==============================
+// レシピ保存
+// ==============================
+
+function saveRecipe(recipeName, overwriteId = null) {
+  // 人数を取得
+  const peopleEl = document.getElementById("people");
+  const people = parseFloat(normalizeNumber(peopleEl.value)) || 1;
+
+  // 食材行を収集
+  const rows = document.querySelectorAll("#ingredient-row .row");
+  const items = [];
+
+  rows.forEach(row => {
+    const name  = row.querySelector(".name").value.trim();
+    const total = parseFloat(normalizeNumber(row.querySelector(".total").value));
+    const price = parseFloat(normalizeNumber(row.querySelector(".price").value));
+    const unit  = row.querySelector(".unit").value;
+    const used  = parseFloat(normalizeNumber(row.querySelector(".used").value));
+
+    if (!name) return;
+
+    // 食材を自動登録・更新
+    const existing = IngredientStore.getAll().find(i => i.name === name);
+    if (!existing) {
+      // 未登録なら新規登録
+      if (total > 0 && price > 0) {
+        const id = generateIngredientId();
+        IngredientStore.upsert({ id, name, price, total, unit });
+      }
+    } else if (
+      (total > 0 && total !== existing.total) ||
+      (price > 0 && price !== existing.price) ||
+      unit !== existing.unit
+    ) {
+      // 登録済みで内容が変わっていれば更新
+      IngredientStore.upsert({ ...existing, price: price || existing.price, total: total || existing.total, unit });
+    }
+    // 変更なしなら何もしない
+
+    items.push({ name, used, unit });
+  });
+
+  const recipe = {
+    id: overwriteId ?? "r_" + Date.now(),
+    name: recipeName,
+    people,
+    items,
+  };
+
+  RecipeStore.upsert(recipe);
+  renderIngredientList();
+  renderRecipeList();
+  alert(`「${recipeName}」を保存しました`);
+}
+
+// ==============================
+// レシピ呼び出し
+// ==============================
+
+function loadRecipe(id) {
+  const recipe = RecipeStore.getAll().find(r => r.id === id);
+  if (!recipe) return;
+
+  // 入力中の内容があれば確認
+  const rows = document.querySelectorAll("#ingredient-row .row");
+  const hasInput = Array.from(rows).some(row =>
+    row.querySelector(".name").value.trim() !== ""
+  );
+
+  if (hasInput) {
+    if (!confirm("現在の入力内容が消えますがよいですか？")) return;
+  }
+
+  // 人数をセット
+  document.getElementById("people").value = recipe.people;
+
+  // 食材行をクリアして再描画
+  const list = document.getElementById("ingredient-row");
+  list.innerHTML = "";
+
+  recipe.items.forEach(item => {
+    const row = createRow();
+    list.appendChild(row);
+
+    row.querySelector(".name").value = item.name;
+    row.querySelector(".used").value = item.used;
+
+    // 登録済み食材から価格・内容量を補完
+    const stored = IngredientStore.getAll().find(i => i.name === item.name);
+    if (stored) {
+      row.querySelector(".price").value = Number(stored.price).toLocaleString();
+      row.querySelector(".total").value = Number(stored.total).toLocaleString();
+      const unitSelect = row.querySelector(".unit");
+      unitSelect.value = stored.unit ?? item.unit ?? "g";
+      row.querySelector(".unit-label").textContent = unitSelect.value;
+    } else {
+      const unitSelect = row.querySelector(".unit");
+      unitSelect.value = item.unit ?? "g";
+      row.querySelector(".unit-label").textContent = unitSelect.value;
+    }
+  });
+
+  // 計算して結果を表示
+  calculate();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// ==============================
+// レシピ削除
+// ==============================
+
+function deleteRecipe(id) {
+  const recipe = RecipeStore.getAll().find(r => r.id === id);
+  if (!recipe) return;
+  if (!confirm(`「${recipe.name}」を削除しますか？`)) return;
+  RecipeStore.deleteById(id);
+  renderRecipeList();
+}
+
+// ==============================
+// レシピ一覧描画
+// ==============================
+
+function renderRecipeList() {
+  const list = document.getElementById("recipe-list");
+  const recipes = RecipeStore.getAll();
+
+  if (recipes.length === 0) {
+    list.innerHTML = '<p class="empty-msg">保存されたレシピはありません</p>';
+    return;
+  }
+
+  list.innerHTML = recipes.map(r => `
+    <div class="recipe-item">
+      <span class="recipe-name">${r.name}</span>
+      <span class="recipe-meta">${r.people}人前・${r.items.length}品</span>
+      <div class="actions">
+        <button class="btn-secondary btn-sm" onclick="loadRecipe('${r.id}')">呼び出し</button>
+        <button class="btn-icon delete-btn" onclick="deleteRecipe('${r.id}')" title="削除">
+          ${TRASH_ICON_SVG}
+        </button>
+      </div>
+    </div>
+  `).join("");
+}

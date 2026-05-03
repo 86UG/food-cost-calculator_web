@@ -45,6 +45,7 @@
 
         <!-- 計算ボタン -->
         <button class="btn-primary calc-btn" onclick="calculate()">計算</button>
+        <button class="btn-secondary recipe-save-btn" onclick="openRecipeModal()">レシピを保存</button>
       </section>
         
       <!-- 結果パネル -->
@@ -62,6 +63,36 @@
         </div>
         <div id="ingredient-list"></div>
       </section>
+      <!-- レシピパネル -->
+      <section class="panel">
+        <h2>保存済みレシピ</h2>
+        <div id="recipe-list"></div>
+      </section>
+    </div><!-- /.container -->
+
+    <!-- 上書き確認モーダル -->
+    <div id="overwrite-modal" class="modal-overlay hidden">
+      <div class="modal">
+        <h3>同名のレシピが存在します</h3>
+        <p class="modal-msg">「<span id="overwrite-recipe-name"></span>」を上書きしますか？</p>
+        <div class="modal-actions">
+          <button class="btn-secondary" id="btn-cancel-overwrite">キャンセル</button>
+          <button class="btn-secondary" id="btn-new-save">新規保存</button>
+          <button class="btn-primary" id="btn-overwrite">上書き保存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- レシピ名入力モーダル -->
+    <div id="recipe-modal" class="modal-overlay hidden">
+      <div class="modal">
+        <h3>レシピ名を入力</h3>
+        <input type="text" id="recipe-name-input" placeholder="例：鶏肉の煮込み" maxlength="40">
+        <div class="modal-actions">
+          <button class="btn-secondary" onclick="closeRecipeModal()">キャンセル</button>
+          <button class="btn-primary" onclick="confirmSaveRecipe()">保存</button>
+        </div>
+      </div>
     </div>
 
     <script src="main.js" defer></script>

@@ -520,3 +520,94 @@ button {
 /* 編集時 input */
 .ingredient-item input.col-name  { flex: 0 0 30%; padding: 0 var(--control-px); min-width: 0;}
 .ingredient-item input.col-price { flex: 0 0 22%; padding: 0 var(--control-px); min-width: 0; text-align: right; }
+/* ==============================
+   レシピ保存ボタン
+   ============================== */
+.recipe-save-btn { margin: 8px 0 0 8px; }
+
+/* ==============================
+   モーダル
+   ============================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.hidden { display: none; }
+
+.modal {
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 24px;
+  width: 90%;
+  max-width: 320px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+.modal h3 { margin: 0 0 16px 0; font-size: 16px; }
+
+.modal input {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 16px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ==============================
+   レシピ一覧
+   ============================== */
+.recipe-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 4px;
+  border-bottom: 1px solid #eee;
+  transition: background 0.15s ease;
+}
+
+.recipe-item:last-child { border-bottom: none; }
+.recipe-item:hover { background: var(--row-hover-color); }
+
+.recipe-name {
+  font-size: 14px;
+  font-weight: 500;
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.recipe-meta {
+  font-size: 11px;
+  color: var(--text-sub);
+  white-space: nowrap;
+}
+
+.btn-sm {
+  height: 28px;
+  font-size: 12px;
+  padding: 0 10px;
+  white-space: nowrap;
+}
+
+.empty-msg {
+  font-size: 13px;
+  color: var(--text-sub);
+  margin: 4px 0;
+}
+
+.modal-msg {
+  font-size: 13px;
+  color: var(--text-sub);
+  margin: 0 0 16px 0;
+}
