@@ -20,12 +20,14 @@
       <!-- タイトル -->
     <div id="title-area">
       <h1>その一皿、いくら？</h1>
-      <p>食材の価格・内容量・使用量を入力すると一人前の費用がわかります。</p>
+      <p>食材の内容量・価格・使用量を入力すると一人前の費用がわかります。</p>
       <!-- <p>食費を厳密に管理したい、節約を頑張るあなたに。</p> -->
     </div>
 
     <!-- 本文 -->
     <div class="container">
+      <!-- 左カラム -->
+      <div class="col-left">
       <!-- 入力パネル -->
       <section class="panel">
         <!-- 人前 -->
@@ -52,22 +54,31 @@
       <section class="panel hidden" id="result-panel">
         <div class="result" id="result"></div>
       </section>
-      
+      </div><!-- /.col-left -->
+
+      <!-- 右カラム -->
+      <div class="col-right">
       <!-- 一覧パネル -->
       <section class="panel">
-        <h2>登録済み食材</h2>
-        <div class="header">
-          <div class="col-name">食材名</div>
-          <div class="col-price">価格</div>
-          <div class="col-total">内容量</div>
+        <div class="panel-header-toggle" onclick="togglePanel('ingredient-list-body', this)">
+          <h2>登録済み食材</h2>
+          <span class="toggle-icon">▲</span>
         </div>
-        <div id="ingredient-list"></div>
+        <div id="ingredient-list-body">
+          <div class="header">
+            <div class="col-name">食材名</div>
+            <div class="col-total">内容量</div>
+            <div class="col-price">価格</div>
+          </div>
+          <div id="ingredient-list"></div>
+        </div>
       </section>
       <!-- レシピパネル -->
       <section class="panel">
         <h2>保存済みレシピ</h2>
         <div id="recipe-list"></div>
       </section>
+      </div><!-- /.col-right -->
     </div><!-- /.container -->
 
     <!-- 上書き確認モーダル -->

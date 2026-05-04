@@ -153,8 +153,7 @@ function createRow() {
     </div>
 
     <div class="row-line2">
-      <span class="used-label">使用量</span>
-      <input type="text" class="used" inputmode="decimal" placeholder="0">
+      <input type="text" class="used" inputmode="decimal" placeholder="使用量">
       <span class="unit-label">g</span>
 
       <div class="actions">
@@ -235,7 +234,7 @@ function addRow() {
 
   list.appendChild(newRow);
 
-  newRow.querySelector(".name").focus()
+  newRow.querySelector(".name").focus();
 }
 
 function calculate() {
@@ -378,8 +377,8 @@ function createIngredientRow(item) {
 
   div.innerHTML = `
     <div class="col-name">${item.name}</div>
-    <div class="col-price">${Number(item.price).toLocaleString()} 円</div>
     <div class="col-total">${Number(item.total).toLocaleString()} ${item.unit ?? ""}</div>
+    <div class="col-price">${Number(item.price).toLocaleString()} 円</div>
     <div class="actions">
       <button class="btn-icon edit-btn" aria-label="編集" title="編集">
         ${EDIT_ICON_SVG}
@@ -401,12 +400,6 @@ function createIngredientRow(item) {
 
   return div;
 }
-
-// 食材一覧から削除
-// function deleteIngredient(index) {
-//   IngredientStore.deleteByIndex(index);
-//   renderIngredientList();
-// }
 
 // 食材を編集
 function editIngredient(id) {
@@ -435,7 +428,6 @@ function createEditRow(item) {
   const unitVal = item.unit ?? "g";
   div.innerHTML = `
     <input class="col-name" value="${item.name}">
-    <input class="col-price" inputmode="decimal" value="${Number(item.price).toLocaleString()}">
     <div class="col-total-wrapper">
       <input class="col-total" inputmode="decimal" value="${Number(item.total).toLocaleString()}">
       <select class="col-unit">
@@ -444,6 +436,7 @@ function createEditRow(item) {
         <option value="個" ${unitVal === "個" ? "selected" : ""}>個</option>
       </select>
     </div>
+    <input class="col-price" inputmode="decimal" value="${Number(item.price).toLocaleString()}">
     <div class="actions">
       <button class="btn-icon save-btn" aria-label="保存" title="保存">
         ${SAVE_ICON_SVG}
@@ -496,9 +489,8 @@ function saveEdit(id) {
 }
 
 // ==============================
-// Autocomplete（食材名）
+// オートコンプリート（食材名）
 // ==============================
-
 document.addEventListener("click", e => {
   document.querySelectorAll(".suggestions").forEach(list => {
     const wrapper = list.closest(".name-wrapper");
@@ -642,12 +634,8 @@ function focusUsedInput(currentInput) {
 }
 
 // ==============================
-// 
+// レシピストア
 // ==============================
-// ==============================
-// RecipeStore
-// ==============================
-
 const RecipeStore = (() => {
   const KEY = "recipes";
 
@@ -678,7 +666,6 @@ const RecipeStore = (() => {
 // ==============================
 // レシピ保存モーダル
 // ==============================
-
 function openRecipeModal() {
   const input = document.getElementById("recipe-name-input");
   input.value = "";
@@ -734,7 +721,6 @@ function closeOverwriteModal() {
 // ==============================
 // レシピ保存
 // ==============================
-
 function saveRecipe(recipeName, overwriteId = null) {
   // 人数を取得
   const peopleEl = document.getElementById("people");
@@ -790,7 +776,6 @@ function saveRecipe(recipeName, overwriteId = null) {
 // ==============================
 // レシピ呼び出し
 // ==============================
-
 function loadRecipe(id) {
   const recipe = RecipeStore.getAll().find(r => r.id === id);
   if (!recipe) return;
@@ -824,14 +809,13 @@ function loadRecipe(id) {
     if (stored) {
       row.querySelector(".price").value = Number(stored.price).toLocaleString();
       row.querySelector(".total").value = Number(stored.total).toLocaleString();
-      const unitSelect = row.querySelector(".unit");
       unitSelect.value = stored.unit ?? item.unit ?? "g";
       row.querySelector(".unit-label").textContent = unitSelect.value;
     } else {
-      const unitSelect = row.querySelector(".unit");
       unitSelect.value = item.unit ?? "g";
       row.querySelector(".unit-label").textContent = unitSelect.value;
     }
+    const unitSelect = row.querySelector(".unit");
   });
 
   // 計算して結果を表示
@@ -842,7 +826,6 @@ function loadRecipe(id) {
 // ==============================
 // レシピ削除
 // ==============================
-
 function deleteRecipe(id) {
   const recipe = RecipeStore.getAll().find(r => r.id === id);
   if (!recipe) return;
@@ -854,7 +837,6 @@ function deleteRecipe(id) {
 // ==============================
 // レシピ一覧描画
 // ==============================
-
 function renderRecipeList() {
   const list = document.getElementById("recipe-list");
   const recipes = RecipeStore.getAll();
@@ -876,4 +858,14 @@ function renderRecipeList() {
       </div>
     </div>
   `).join("");
+}
+
+// ==============================
+// パネル折りたたみ
+// ==============================
+function togglePanel(bodyId, headerEl) {
+  const body = document.getElementById(bodyId);
+  const icon = headerEl.querySelector(".toggle-icon");
+  const isHidden = body.classList.toggle("hidden");
+  icon.textContent = isHidden ? "▼" : "▲";
 }
