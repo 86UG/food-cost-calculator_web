@@ -805,17 +805,16 @@ function loadRecipe(id) {
     row.querySelector(".used").value = item.used;
 
     // 登録済み食材から価格・内容量を補完
+    const unitSelect = row.querySelector(".unit");
     const stored = IngredientStore.getAll().find(i => i.name === item.name);
     if (stored) {
       row.querySelector(".price").value = Number(stored.price).toLocaleString();
       row.querySelector(".total").value = Number(stored.total).toLocaleString();
       unitSelect.value = stored.unit ?? item.unit ?? "g";
-      row.querySelector(".unit-label").textContent = unitSelect.value;
     } else {
       unitSelect.value = item.unit ?? "g";
-      row.querySelector(".unit-label").textContent = unitSelect.value;
     }
-    const unitSelect = row.querySelector(".unit");
+    row.querySelector(".unit-label").textContent = unitSelect.value;
   });
 
   // 計算して結果を表示

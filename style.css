@@ -649,3 +649,34 @@ button {
   font-size: 12px;
   color: var(--text-sub);
 }
+
+/* ==============================
+    フッター
+   ============================== */
+#site-footer {
+  margin-top: 40px;
+  padding: 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.footer-copy {
+  font-size: 12px;
+  color: var(--text-sub);
+  margin: 0;
+}
+
+.footer-nav a {
+  font-size: 12px;
+  color: var(--text-sub);
+  text-decoration: none;
+}
+
+.footer-nav a:hover {
+  color: var(--primary-color);
+  text-decoration: underline;
+}
